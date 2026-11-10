@@ -1,0 +1,15 @@
+{
+  "clusters": [
+    {
+      "name": "价格相关",
+      "keywords": ["价格"],
+      "regex": ["多少钱|费用"],
+      "match": "any",
+      "exclude": ["免费"]
+    },
+    {
+      "name": "保存相关",
+      "regex": ["保存|保鲜"]
+    }
+  ]
+}

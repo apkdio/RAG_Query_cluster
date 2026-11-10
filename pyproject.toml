@@ -1,0 +1,10 @@
+[project]
+name = "query-core"
+version = "0.1.0"
+description = "固定阈值的词汇聚类与 QK 双路匹配"
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
