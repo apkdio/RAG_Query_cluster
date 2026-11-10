@@ -1,0 +1,60 @@
+.gitignore
+  h_26b9a38f4942dd 1-3,10-11
+  s_1250751e5fa60e::t_923233ee1536b2 4-9,12-13
+query_core/manual.py
+  s_1250751e5fa60e::t_eb54696f83ae19 33
+  s_1250751e5fa60e::t_72e60d900efea6 1-10,35-67
+  s_1250751e5fa60e::t_d503943af3245b 12-14
+query_core/canvas.py
+  s_1250751e5fa60e::t_2c47681ea9084f 20
+  s_1250751e5fa60e::t_a65e77af4af4ac 8
+README.md
+  s_1250751e5fa60e::t_b3c135b3b8bb2b 36
+  s_1250751e5fa60e::t_ca45738b6e388d 41-50,74-75,77
+  s_1250751e5fa60e::t_c620b8a9f1f02b 55-65
+  s_1250751e5fa60e::t_6f49d790d0bde6 85-97
+  s_1250751e5fa60e::t_f32e4a71e37fe8 99-100
+  s_1250751e5fa60e::t_c13d2dc53c1efe 153
+  s_1250751e5fa60e::t_f4ba7c179c45da 70-73
+  s_1250751e5fa60e::t_4fe14f64623fa6 125-132
+  s_1250751e5fa60e::t_88c40d6212ebe8 68-69,76
+  s_1250751e5fa60e::t_267c6b40fccabc 25-26
+  s_1250751e5fa60e::t_4633e95810c7eb 156
+query_core/__main__.py
+  s_1250751e5fa60e::t_3ebc861d9781c8 46-55
+examples/inputs.txt
+  s_1250751e5fa60e::t_5920d2e5a0ab5b 1
+examples/qk_table.txt
+  s_1250751e5fa60e::t_0fc5edbdc278c7 2-3
+tests/test_core.py
+  s_1250751e5fa60e::t_8ba5e5f3fcfa48 32-56
+  s_1250751e5fa60e::t_399248194b458b 59-68
+  s_1250751e5fa60e::t_1d5621abba4dc6 12-25,72-82
+query_core/pipeline.py
+  s_1250751e5fa60e::t_5929da3bf4768c 46-47
+  s_1250751e5fa60e::t_1f5f20b33a8f80 81
+examples/rules.json
+  s_1250751e5fa60e::t_f806e4cdc06244 1-2,14-15
+  s_1250751e5fa60e::t_2806d92f204669 3-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "fa8fb02799b3170ac0ce5b29b8b1d8865386d808",
+  "prompts": {},
+  "humans": {
+    "h_26b9a38f4942dd": {
+      "author": "apkdio <apkdio@163.com>"
+    }
+  },
+  "sessions": {
+    "s_1250751e5fa60e": {
+      "agent_id": {
+        "tool": "chengxiaobang",
+        "id": "s_bd3qkvb2jhxu",
+        "model": "DeepSeek-V4.1-Flash"
+      },
+      "human_author": "apkdio <apkdio@163.com>"
+    }
+  }
+}
