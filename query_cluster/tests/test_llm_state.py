@@ -185,5 +185,5 @@ def test_save_result_writes_state_and_naming(tmp_path):
 
     result = review_state(sample_state(), "测试", chat)
     save_result(result, tmp_path)
-    for name in ("state.json", "patch.json", "patch_log.json", "naming.json"):
+    for name in ("state.llm.json", "patch.json", "patch_log.json", "naming.json"):
         assert (tmp_path / name).exists()

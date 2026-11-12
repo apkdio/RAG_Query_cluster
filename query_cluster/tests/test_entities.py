@@ -1,6 +1,7 @@
 import pytest
 
 from query_cluster.entities import (
+    CLUSTER_KINDS,
     Cluster,
     Query,
     ReviewState,
@@ -110,11 +111,17 @@ def test_state_rejects_pool_overlap():
         state.validate()
 
 
+def test_cluster_kinds_are_locked():
+    assert CLUSTER_KINDS == {"auto", "manual", "llm"}
+
+
 def test_state_rejects_invalid_kind():
     state = make_state()
-    state.clusters["C1"].kind = "manual"
+    state.clusters["C1"].kind = "other"
     with pytest.raises(StateError):
         state.validate()
+    state.clusters["C1"].kind = "manual"
+    state.validate()
 
 
 def test_state_rejects_unsupported_version():

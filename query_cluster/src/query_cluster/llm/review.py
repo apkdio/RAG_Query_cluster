@@ -6,9 +6,10 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..clustering.pipeline import write_state
+from ..clustering.pipeline import write_state_file
 from ..entities.events import new_event
 from ..entities.state import ReviewState
+from ..state_files import LLM_STATE
 from .patch import PatchError, apply_patch
 from .prompts import build_naming_messages, build_patch_messages
 
@@ -144,7 +145,7 @@ def review_state(state: ReviewState, instructions: str, chat, max_attempts: int 
 def save_result(result: ReviewResult, out_dir: Path | str) -> Path:
     out_path = Path(out_dir)
     out_path.mkdir(parents=True, exist_ok=True)
-    state_path = write_state(result.state, out_path)
+    state_path = write_state_file(result.state, out_path / LLM_STATE)
     (out_path / "patch.json").write_text(
         json.dumps(result.patch, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (out_path / "patch_log.json").write_text(

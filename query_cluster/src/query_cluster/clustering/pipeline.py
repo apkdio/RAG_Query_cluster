@@ -53,21 +53,25 @@ def build_state(raw: str, backend: str = "auto", threshold: float = THRESHOLD,
     return state
 
 
-def write_state(state: ReviewState, out_dir: Path | str) -> Path:
-    out_path = Path(out_dir)
-    out_path.mkdir(parents=True, exist_ok=True)
-    path = out_path / "state.json"
-    temporary = path.with_name(path.name + ".tmp")
+def write_state_file(state: ReviewState, path: Path | str) -> Path:
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    temporary = target.with_name(target.name + ".tmp")
     body = json.dumps(state.to_dict(), ensure_ascii=False, indent=2) + "\n"
     for attempt in range(3):
         try:
             temporary.write_text(body, encoding="utf-8")
-            temporary.replace(path)
-            return path
+            temporary.replace(target)
+            return target
         except OSError:
             if attempt < 2:
                 time.sleep(0.05)
     # 某些 Windows 临时目录不允许 rename 覆盖，退化为直接写目标文件。
-    path.write_text(body, encoding="utf-8")
+    target.write_text(body, encoding="utf-8")
     temporary.unlink(missing_ok=True)
-    return path
+    return target
+
+
+def write_state(state: ReviewState, out_dir: Path | str,
+                filename: str = "state.json") -> Path:
+    return write_state_file(state, Path(out_dir) / filename)

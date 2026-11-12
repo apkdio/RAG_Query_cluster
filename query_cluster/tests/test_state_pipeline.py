@@ -45,3 +45,10 @@ def test_write_state_roundtrip(tmp_path):
     assert payload["meta"]["stage"] == "clustering"
     assert "count" not in payload["queries"]["Q0001"]
     assert "label" not in payload["clusters"][0]
+
+
+def test_write_state_custom_filename(tmp_path):
+    state = build_state("苹果多少钱|香蕉价格", backend="hash")
+    path = write_state(state, tmp_path, filename="state.clustering.json")
+    assert path.name == "state.clustering.json"
+    assert path.exists()

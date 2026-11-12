@@ -5,7 +5,7 @@ Query 聚类复核与 QK 召回验证的工作区，包含两个互不依赖的�
 - `query_cluster/`：词表输入、自动聚类、LLM 初审、人工复核；
 - `qk_validation/`：QK 词表匹配与召回验证。
 
-当前 S0 目录搬迁、S1 实体层、S2 输入/预处理/自动聚类、S3 LLM 归类/命名、S4 本地复核服务已落地；变更对比仍按 `DESIGN_LLM_REVIEW.md` 在后续阶段实现。
+当前 S0–S5 已完成；算法、LLM、人工三类结果统一放在同一个 run 目录，使用 `state.clustering.json / state.llm.json / state.human.json` 命名。旧 `cluster` 链路暂时保留。
 
 ## 目录
 
@@ -35,18 +35,19 @@ query_core/
 # 在仓库根目录
 uv sync --all-packages
 
-# 新状态链路：输出 state.json
+# 新状态链路：输出 state.clustering.json
 uv run --package query-cluster python -m query_cluster cluster `
   --input query_cluster/examples/inputs.txt --backend hash --state `
-  --out query_cluster/out
+  --out query_cluster/out/run1
 
-# LLM 两阶段复核
+# LLM 两阶段复核：输出 state.llm.json 到同一个 run 目录
 uv run --package query-cluster python -m query_cluster llm-review --state `
-  --clusters query_cluster/out/state.json --out query_cluster/out/llm
+  --clusters query_cluster/out/run1/state.clustering.json `
+  --out query_cluster/out/run1
 
-# 本地复核服务
+# 本地复核服务：加载任意阶段 JSON
 uv run --package query-cluster python -m query_cluster serve `
-  --state query_cluster/out/state.json
+  --state query_cluster/out/run1/state.llm.json
 
 # 旧链路：输出 clusters.json + review.html
 uv run --package query-cluster python -m query_cluster cluster `

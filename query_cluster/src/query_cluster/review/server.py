@@ -7,9 +7,11 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
 
-from ..clustering.pipeline import write_state
+from ..clustering.pipeline import write_state_file
 from ..entities.state import ReviewState, StateError
+from ..state_files import HUMAN_STATE
 from .actions import ActionError, apply_action
+from .diff import diff_states
 from .export import export_dict
 
 DEFAULT_TEMPLATE = Path(__file__).resolve().parents[3] / "templates" / "review.html"
@@ -108,7 +110,7 @@ def make_server(state: ReviewState, state_path: Path | str,
                 raise ActionError("请求体不是合法 JSON") from exc
 
         def _persist(self) -> None:
-            write_state(type(self).review_state, state_file.parent)
+            write_state_file(type(self).review_state, state_file)
 
         def do_GET(self) -> None:
             path = urlparse(self.path).path
@@ -124,7 +126,7 @@ def make_server(state: ReviewState, state_path: Path | str,
             if path == "/api/export":
                 payload = export_dict(type(self).review_state)
                 self._json(payload, extra={
-                    "Content-Disposition": 'attachment; filename="review_state.json"',
+                    "Content-Disposition": f'attachment; filename="{HUMAN_STATE}"',
                 })
                 return
             if path in {"/", "/index.html"}:
@@ -163,6 +165,13 @@ def make_server(state: ReviewState, state_path: Path | str,
                     next_state = ReviewState.from_dict(payload)
                     self._commit(next_state)
                     self._json(next_state.to_dict())
+                    return
+                if path == "/api/diff":
+                    if not isinstance(payload, dict):
+                        raise ActionError("diff 请求必须是对象")
+                    base = ReviewState.from_dict(payload.get("base"))
+                    target = ReviewState.from_dict(payload.get("target"))
+                    self._json(diff_states(base, target))
                     return
                 self._error("not found", 404)
             except (ActionError, StateError, ValueError) as exc:

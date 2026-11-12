@@ -21,6 +21,7 @@ from .manual import load_rules
 from .pipeline import build_clusters, load_input, write_result
 from .qk import match
 from .review.server import serve as serve_review
+from .state_files import CLUSTERING_STATE
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -35,14 +36,14 @@ def main(argv: list[str] | None = None) -> int:
     p_cluster.add_argument("--out", default=str(ROOT / "out"), help="输出目录")
     p_cluster.add_argument("--backend", choices=["auto", "ollama", "hash"], default="auto")
     p_cluster.add_argument("--rules", default=None, help="手动规则簇 JSON；命中的先归到指定类")
-    p_cluster.add_argument("--state", action="store_true", help="输出新的 ReviewState state.json")
+    p_cluster.add_argument("--state", action="store_true", help="输出新的 ReviewState state.clustering.json")
 
     p_review = sub.add_parser("review", help="从已有 clusters.json 生成复核页")
     p_review.add_argument("--clusters", required=True)
     p_review.add_argument("--out", required=True)
 
     p_serve = sub.add_parser("serve", help="启动新的 ReviewState 本地复核服务")
-    p_serve.add_argument("--state", required=True, help="state.json")
+    p_serve.add_argument("--state", required=True, help="state.clustering.json / state.llm.json / state.human.json")
     p_serve.add_argument("--host", default="127.0.0.1")
     p_serve.add_argument("--port", type=int, default=8765)
 
@@ -53,15 +54,15 @@ def main(argv: list[str] | None = None) -> int:
     p_qk.add_argument("--json", action="store_true")
 
     p_llm = sub.add_parser("llm-review", help="LLM 初审并应用 patch")
-    p_llm.add_argument("--clusters", required=True, help="输入 clusters.json 或 state.json")
-    p_llm.add_argument("--out", required=True, help="输出目录")
+    p_llm.add_argument("--clusters", required=True, help="输入 clusters.json 或 state.clustering.json")
+    p_llm.add_argument("--out", default=None, help="输出目录；默认与 --clusters 同目录")
     p_llm.add_argument("--state", action="store_true", help="按新的 ReviewState 两阶段流程运行")
     p_llm.add_argument("--instructions", default=STATE_INSTRUCTIONS)
     p_llm.add_argument("--instructions-file", default=None)
     p_llm.add_argument("--base-url", default=None, help="OpenAI 兼容接口，默认 LLM_BASE_URL")
     p_llm.add_argument("--model", default=None, help="模型名，默认 LLM_MODEL")
-    p_llm.add_argument("--api-key-env", default="LLM_API_KEY")
-    p_llm.add_argument("--timeout", type=int, default=90)
+    p_llm.add_argument("--api-key-env", default=None, help="默认取 config/llm.json 或 LLM_API_KEY")
+    p_llm.add_argument("--timeout", type=int, default=None, help="默认取 config/llm.json")
     p_llm.add_argument("--max-attempts", type=int, default=3)
 
     args = parser.parse_args(argv)
@@ -73,7 +74,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.rules:
                 parser.error("--state 暂不支持 --rules")
             state = build_state(raw, backend=args.backend)
-            state_path = write_state(state, out_dir)
+            state_path = write_state(state, out_dir, filename=CLUSTERING_STATE)
             print(f"{len(state.queries)} 个词 -> {len(state.clusters)} 个簇")
             print(f"状态：{state_path}")
             return 0
@@ -100,7 +101,7 @@ def main(argv: list[str] | None = None) -> int:
         instructions = args.instructions
         if args.instructions_file:
             instructions = Path(args.instructions_file).read_text(encoding="utf-8")
-        out_dir = Path(args.out)
+        out_dir = Path(args.out) if args.out else Path(args.clusters).parent
         if args.state:
             try:
                 payload = json.loads(Path(args.clusters).read_text(encoding="utf-8"))

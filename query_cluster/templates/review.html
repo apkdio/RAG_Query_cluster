@@ -32,6 +32,105 @@
   .btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
   .btn.primary:hover{background:#1d4ed8;color:#fff}
   .btn:disabled{opacity:.45;cursor:not-allowed}
+  .mode{display:flex;background:#eef2f7;border-radius:8px;padding:2px}
+  .mode button{border:0;background:transparent;padding:5px 10px;border-radius:6px;color:var(--sub);cursor:pointer;font-size:12px}
+  .mode button.active{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(15,23,42,.08)}
+  body.diff-mode .review-only{display:none!important}
+  body:not(.diff-mode) .diff-only{display:none!important}
+  .diffbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);
+           border-radius:10px;padding:8px 10px}
+  .filepick{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:7px;
+            padding:5px 9px;font-size:12px;color:#334155;cursor:pointer;background:#f8fafc}
+  .filepick:hover{border-color:#94a3b8;background:#fff}
+  .filepick input{display:block;max-width:180px;font-size:11px;color:var(--sub)}
+  .filepick input[type=file]{border:1px solid var(--line);border-radius:6px;background:#fff;
+                              padding:3px 6px;color:#334155;cursor:pointer}
+  .filepick input[type=file]::file-selector-button{border:0;border-radius:5px;background:var(--blue);
+                                                   color:#fff;padding:4px 8px;margin-right:6px;
+                                                   font-size:11px;cursor:pointer}
+  .filename{font-size:11px;color:var(--sub);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .diff-toggle{font-size:11px;color:var(--sub);display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+  .diff-toggle input{accent-color:var(--blue)}
+  .diff-summary{display:flex;gap:5px;flex-wrap:wrap;margin-left:auto;align-items:center}
+  .diff-summary .pill b{margin-left:3px}
+  .pill.green{border-color:#bbf7d0;background:var(--green-bg);color:#166534}
+  .pill.red{border-color:#fecaca;background:var(--red-bg);color:#991b1b}
+  .pill.blue{border-color:#bfdbfe;background:var(--blue-bg);color:#1e40af}
+  .pill.orange{border-color:#fde68a;background:var(--orange-bg);color:#92400e}
+  .cluster.diff-new{border-color:#86efac;background:linear-gradient(180deg,#fff,#f0fdf4)}
+  .cluster.diff-changed{border-color:#93c5fd;background:linear-gradient(180deg,#fff,#eff6ff)}
+  .cluster.diff-deleted{border-style:dashed;border-color:#fca5a5;background:#fff7f7;opacity:.9}
+  .cluster.diff-unchanged{opacity:.72}
+  .chip.added{border-color:#86efac;background:var(--green-bg);color:#166534}
+  .chip.removed{border-style:dashed;border-color:#fca5a5;background:var(--red-bg);color:#991b1b;text-decoration:line-through}
+  .chip.qid-hl{box-shadow:0 0 0 3px rgba(37,99,235,.25);border-color:#60a5fa}
+  .diff-canvas{flex:1;min-height:0;display:flex;overflow:hidden;border:1px solid var(--line);border-radius:12px;background:#f8fafc}
+  .diff-layout{display:flex;width:100%;min-height:0}
+  .diff-stage-wrap{position:relative;flex:1;overflow:hidden;cursor:grab;
+    background:radial-gradient(circle at 1px 1px,#dbe3ee 1px,transparent 0) 0 0/22px 22px}
+  .diff-stage-wrap.dragging{cursor:grabbing}
+  #diff-stage{position:absolute;left:0;top:0;width:940px;height:700px;transform-origin:0 0}
+  .diff-zoom{position:absolute;top:10px;left:10px;z-index:12;display:flex;gap:5px;align-items:center;
+             background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:8px;padding:4px 6px;
+             box-shadow:0 2px 8px rgba(15,23,42,.06)}
+  .diff-zoom button{border:0;background:transparent;border-radius:5px;padding:2px 7px;cursor:pointer;
+                    font:inherit;font-size:12px;color:var(--sub)}
+  .diff-zoom button:hover{background:#f1f5f9}
+  .diff-zoom span{font-size:11px;color:var(--sub);min-width:36px;text-align:center}
+  .diff-tipbar{position:absolute;top:10px;right:12px;z-index:11;background:rgba(15,23,42,.82);color:#fff;
+               font-size:11px;padding:4px 10px;border-radius:999px;pointer-events:none;opacity:.75}
+  #diff-stage .cluster{position:absolute;width:286px;padding:11px 12px}
+  #diff-stage .cluster.new{border-color:#93c5fd;box-shadow:0 0 0 4px rgba(37,99,235,.09),0 12px 28px -18px rgba(15,23,42,.3)}
+  #diff-stage .cluster.deleted{border-style:dashed;border-color:#cbd5e1;background:#fbfdff}
+  #diff-stage .cluster.dimmed,.diff-pools .pool.dimmed{opacity:.32;filter:saturate(.55)}
+  #diff-stage .cluster.related,.diff-pools .pool.related{opacity:1;filter:none}
+  #diff-stage .cluster.focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.18),0 14px 30px -18px rgba(15,23,42,.35);transform:translateY(-1px)}
+  #diff-stage .chead{display:flex;align-items:center;gap:7px;margin-bottom:4px;min-width:0}
+  #diff-stage .chead h3{font-size:13.5px;margin:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #diff-stage .oldname{font-size:10px;color:var(--grey,#94a3b8);white-space:nowrap}
+  #diff-stage .delta{margin-left:auto;display:flex;gap:3px;flex:none}
+  #diff-stage .delta span{font-size:9.5px;border-radius:999px;padding:1px 4px}
+  #diff-stage .delta .add{color:#166534;background:var(--green-bg)}
+  #diff-stage .delta .remove{color:#991b1b;background:var(--red-bg)}
+  #diff-stage .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+  #diff-stage .chip{font-size:11.5px;cursor:pointer}
+  #diff-stage .chip .qid{font-size:8.5px}
+  #diff-stage .chip.added{border-color:#86efac;background:var(--green-bg);color:#166534}
+  #diff-stage .chip.removed{border-style:dashed;border-color:#fca5a5;background:var(--red-bg);color:#991b1b;text-decoration:line-through}
+  #diff-stage .chip.qid-hl{box-shadow:0 0 0 3px rgba(37,99,235,.22);border-color:#60a5fa}
+  .diff-pools{position:absolute;right:14px;bottom:14px;z-index:14;display:flex;gap:9px;align-items:flex-end}
+  .diff-pools .pool{width:210px;background:#fff;border:1px dashed #fcd34d;border-radius:11px;padding:8px 10px;
+                    box-shadow:0 4px 14px rgba(15,23,42,.08);transition:opacity .2s,box-shadow .2s}
+  .diff-pools .pool.trash{border-color:#cbd5e1;background:#fbfdff}
+  .diff-pools .pool.focus{border-style:solid;border-color:var(--orange);box-shadow:0 0 0 3px rgba(217,119,6,.15)}
+  .diff-pools .pool.trash.focus{border-color:#94a3b8;box-shadow:0 0 0 3px rgba(148,163,184,.2)}
+  .diff-pools .phead{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#92400e;margin-bottom:5px}
+  .diff-pools .pool.trash .phead{color:#64748b}
+  .diff-pools .pcount{margin-left:auto;font-size:10px;font-weight:500;color:var(--sub)}
+  .diff-pools .chip{font-size:10.5px;padding:3px 6px}
+  .diff-side{width:300px;background:#fff;border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0;z-index:20}
+  .diff-side .ahead{padding:12px 14px 7px;border-bottom:1px solid #eef2f7}
+  .diff-side .ahead h2{font-size:14px;margin:0 0 2px}
+  .diff-side .ahead .sub{font-size:10.5px;color:var(--sub)}
+  .diff-filters{display:flex;gap:4px;flex-wrap:wrap;padding:7px 10px 9px;border-bottom:1px solid #eef2f7}
+  .diff-filters button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 7px;font:inherit;font-size:10px;color:var(--sub);cursor:pointer}
+  .diff-filters button.active{background:#0f172a;color:#fff;border-color:#0f172a}
+  .diff-list{overflow:auto;padding:5px 8px 20px}
+  .diff-group{margin:7px 0 11px}
+  .diff-gtitle{font-size:9.5px;letter-spacing:.04em;color:#94a3b8;text-transform:uppercase;margin:0 4px 3px;display:flex;justify-content:space-between}
+  .diff-row{display:flex;gap:7px;align-items:flex-start;width:100%;text-align:left;border:0;background:transparent;padding:6px;border-radius:7px;cursor:pointer;font:inherit;transition:.12s}
+  .diff-row:hover,.diff-row.active{background:#f1f5f9}
+  .diff-row .icon{width:15px;height:15px;border-radius:5px;font-size:9px;display:flex;align-items:center;justify-content:center;color:#fff;flex:none;margin-top:2px}
+  .diff-row .icon.g{background:var(--green)} .diff-row .icon.r{background:var(--red)} .diff-row .icon.b{background:var(--blue)} .diff-row .icon.o{background:var(--orange)} .diff-row .icon.gy{background:#94a3b8}
+  .diff-row .text{min-width:0}
+  .diff-row .text b{display:block;font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .diff-row .text small{color:var(--sub);font-size:9.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .diff-bubble{position:absolute;left:50%;bottom:18px;transform:translateX(-50%) translateY(8px);z-index:40;
+               background:#0f172a;color:#fff;font-size:12px;padding:7px 12px;border-radius:9px;
+               box-shadow:0 8px 24px rgba(15,23,42,.25);opacity:0;pointer-events:none;transition:.18s ease}
+  .diff-bubble.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  body.diff-mode .board{overflow:hidden}
+  @media(max-width:900px){.diff-side{width:250px}.diff-pools{right:8px;bottom:8px}.diff-pools .pool{width:170px}}
   .hint{font-size:11px;color:var(--sub);white-space:nowrap}
   main{flex:1;min-height:0;display:flex;flex-direction:column;padding:14px 18px 10px;gap:10px}
   #error{display:none;background:var(--red-bg);border:1px solid #fecaca;color:#991b1b;
@@ -53,6 +152,10 @@
   .name:hover{border-color:var(--line);background:#f8fafc}
   .name:focus{outline:none;border-color:#93c5fd;background:#fff;box-shadow:0 0 0 2px rgba(37,99,235,.12)}
   .meta{display:flex;gap:7px;align-items:center;margin:5px 0 8px;color:var(--sub);font-size:10.5px}
+  .fields{display:flex;gap:6px;margin-top:8px}
+  .fields input{min-width:0;flex:1;border:1px solid var(--line);border-radius:6px;padding:4px 6px;
+                font-size:10.5px;color:#334155;background:#f8fafc}
+  .fields input:focus{outline:none;border-color:#93c5fd;background:#fff;box-shadow:0 0 0 2px rgba(37,99,235,.1)}
   .chips{display:flex;flex-wrap:wrap;gap:6px;min-height:32px}
   .chip{display:inline-flex;align-items:center;gap:5px;border:1px solid #e2e8f0;background:#f8fafc;
         border-radius:7px;padding:4px 7px;font-size:12px;max-width:100%;cursor:grab;user-select:none;
@@ -81,6 +184,10 @@
 <body>
 <header>
   <div class="title">簇复核 <span id="stage">ReviewState</span></div>
+  <div class="mode">
+    <button id="mode-review" class="active">复核结果</button>
+    <button id="mode-diff">变更对比</button>
+  </div>
   <div class="stats">
     <span class="pill">查询<b id="stat-queries">0</b></span>
     <span class="pill">簇<b id="stat-clusters">0</b></span>
@@ -88,21 +195,58 @@
     <span class="pill">不可聚类<b id="stat-trash">0</b></span>
   </div>
   <span class="spacer"></span>
-  <span class="hint">拖动词块调整归属 · 双击复制 · 右键放入不可聚类 · Ctrl+Z 撤销 · Ctrl+Shift+Z 重做</span>
-  <button class="btn" id="undo" disabled>撤销</button>
-  <button class="btn" id="redo" disabled>重做</button>
-  <button class="btn" id="create">新建簇</button>
-  <button class="btn" id="load">加载结果</button>
-  <button class="btn primary" id="export">导出 JSON</button>
+  <span class="hint review-only">拖动词块调整归属 · 双击复制 · 右键放入不可聚类 · Ctrl/⌘ 多选后可批量待定/新建簇 · Ctrl+Z 撤销</span>
+  <button class="btn review-only" id="undo" disabled>撤销</button>
+  <button class="btn review-only" id="redo" disabled>重做</button>
+  <button class="btn review-only" id="park" disabled>移到待定</button>
+  <button class="btn review-only" id="create">新建簇</button>
+  <button class="btn review-only" id="load">加载结果</button>
+  <button class="btn primary review-only" id="export">导出 JSON</button>
   <input id="file" type="file" accept=".json" hidden>
 </header>
 
 <main>
+  <div class="diffbar diff-only">
+    <label class="filepick">基准结果<input id="base-file" type="file" accept=".json"></label>
+    <span class="filename" id="base-name">未选择</span>
+    <label class="filepick">对照结果<input id="target-file" type="file" accept=".json"></label>
+    <span class="filename" id="target-name">未选择，默认用当前状态</span>
+    <label class="diff-toggle"><input id="diff-only-changes" type="checkbox" checked> 只看变化</label>
+    <button class="btn primary" id="run-diff" disabled>对比</button>
+    <span class="diff-summary" id="diff-summary"></span>
+  </div>
   <div id="error"></div>
   <section class="board">
-    <div class="grid" id="grid"></div>
+    <div class="grid review-only" id="grid"></div>
+    <div class="diff-canvas diff-only" id="diff-canvas">
+      <div class="diff-layout">
+        <section class="diff-stage-wrap" id="diff-wrap">
+          <div class="diff-zoom">
+            <button id="diff-zoom-out">−</button><span id="diff-zoom-val">100%</span>
+            <button id="diff-zoom-in">＋</button><button id="diff-fit">适应</button>
+          </div>
+          <div class="diff-tipbar">悬浮看关系 · 点击钉住并定位 · 空白拖动平移</div>
+          <div id="diff-stage"></div>
+          <div class="diff-pools" id="diff-pools"></div>
+          <div class="diff-bubble" id="diff-bubble"></div>
+        </section>
+        <aside class="diff-side">
+          <div class="ahead"><h2>变更列表</h2><div class="sub" id="diff-count">共 0 项 · 悬浮预览，点击定位</div></div>
+          <div class="diff-filters">
+            <button class="active" data-diff-filter="all">全部</button>
+            <button data-diff-filter="move">移动</button>
+            <button data-diff-filter="rename">改名</button>
+            <button data-diff-filter="create">新建</button>
+            <button data-diff-filter="delete">删除</button>
+            <button data-diff-filter="pool">待定/垃圾</button>
+            <button data-diff-filter="unmatched">未匹配</button>
+          </div>
+          <div class="diff-list" id="diff-list"></div>
+        </aside>
+      </div>
+    </div>
   </section>
-  <section class="pools">
+  <section class="pools review-only">
     <div class="pool" data-pool="pending">
       <div class="phead">待定<span class="pcount" id="pending-count">0</span></div>
       <div class="chips" id="pending-chips"></div>
@@ -121,6 +265,17 @@ let selected = new Set();
 let drafts = [];
 let draftSeq = 0;
 let historyState = {undo: false, redo: false};
+let mode = "review";
+let initialData = null;
+let baseData = null;
+let targetData = null;
+let diffData = null;
+let onlyChanges = true;
+let diffZoom = 1;
+let diffPanX = 0;
+let diffPanY = 0;
+let diffPin = null;
+let diffDrag = null;
 let toastTimer = null;
 
 const $ = (id) => document.getElementById(id);
@@ -159,6 +314,11 @@ async function refreshHistory() {
 async function refresh() {
   try {
     DATA = await request("/api/state");
+    if (!initialData) initialData = JSON.parse(JSON.stringify(DATA));
+    if (!baseData) {
+      $("base-name").textContent = "当前初始状态";
+      $("run-diff").disabled = false;
+    }
     await refreshHistory();
     showError("");
     render();
@@ -249,6 +409,8 @@ function chip(qid) {
 
 function updateSelection() {
   $("create").textContent = selected.size ? `新建簇 (${selected.size})` : "新建簇";
+  $("park").disabled = selected.size === 0;
+  $("park").textContent = selected.size ? `移到待定 (${selected.size})` : "移到待定";
 }
 
 function bindDrop(zone, target) {
@@ -281,7 +443,439 @@ async function materializeDraft(draft, qid) {
   }
 }
 
+function diffEsc(value) {
+  return String(value ?? "").replace(/[&<>"]/g, (ch) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;",
+  }[ch]));
+}
+
+function locationName(location) {
+  if (!location) return "?";
+  if (location.kind === "cluster") return `${location.cluster_id} ${location.name || ""}`.trim();
+  return location.kind === "pending" ? "待定" : "不可聚类";
+}
+
+function diffCanvasChip(qid, text, kind) {
+  const el = document.createElement("div");
+  el.className = "chip" + (kind ? " " + kind : "");
+  el.dataset.qid = qid;
+  el.title = text;
+  const id = document.createElement("span");
+  id.className = "qid";
+  id.textContent = qid;
+  const label = document.createElement("span");
+  label.textContent = text;
+  el.append(id, label);
+  el.addEventListener("mouseenter", () => {
+    if (!diffPin) diffHighlight(qid, false);
+  });
+  el.addEventListener("mouseleave", () => {
+    if (!diffPin) diffClearHighlight();
+  });
+  el.addEventListener("click", (event) => {
+    event.stopPropagation();
+    if (diffPin === qid) diffClearPin();
+    else diffSelectQid(qid);
+  });
+  el.addEventListener("dblclick", async (event) => {
+    event.preventDefault();
+    try {
+      await navigator.clipboard.writeText(text);
+      toast("已复制：" + text);
+    } catch {
+      toast("复制失败，请手动选择文本");
+    }
+  });
+  return el;
+}
+
+function diffApplyTransform(animate) {
+  const stage = $("diff-stage");
+  stage.style.transition = animate ? "transform .35s ease" : "none";
+  stage.style.transform = (diffZoom === 1 && diffPanX === 0 && diffPanY === 0)
+    ? "none" : `translate(${diffPanX}px, ${diffPanY}px) scale(${diffZoom})`;
+  $("diff-zoom-val").textContent = Math.round(diffZoom * 100) + "%";
+}
+
+function diffFit() {
+  const wrap = $("diff-wrap").getBoundingClientRect();
+  const stage = $("diff-stage");
+  const width = stage.offsetWidth || 940;
+  const height = stage.offsetHeight || 700;
+  diffZoom = Math.min(1, (wrap.width - 40) / width, (wrap.height - 40) / height);
+  diffPanX = 0;
+  diffPanY = 0;
+  diffApplyTransform(true);
+}
+
+function diffClearHighlight() {
+  document.querySelectorAll("#diff-stage .cluster,.diff-pools .pool").forEach((el) => {
+    el.classList.remove("related", "dimmed", "focus");
+  });
+  document.querySelectorAll("#diff-stage .qid-hl").forEach((el) => el.classList.remove("qid-hl"));
+  document.querySelectorAll(".diff-list .diff-row").forEach((el) => el.classList.remove("active"));
+}
+
+function diffRelatedCards(qid) {
+  const cards = new Set();
+  document.querySelectorAll(`#diff-stage [data-qid="${qid}"]`).forEach((el) => {
+    const card = el.closest("[data-card]");
+    if (card) cards.add(card.dataset.card);
+  });
+  return cards;
+}
+
+function diffHighlight(qid, focus) {
+  diffClearHighlight();
+  const cards = diffRelatedCards(qid);
+  document.querySelectorAll("#diff-stage .cluster,.diff-pools .pool").forEach((el) => {
+    if (cards.has(el.dataset.card)) el.classList.add("related");
+    else el.classList.add("dimmed");
+  });
+  if (focus) {
+    document.querySelectorAll("#diff-stage .cluster,.diff-pools .pool").forEach((el) => {
+      if (cards.has(el.dataset.card)) el.classList.add("focus");
+    });
+  }
+  document.querySelectorAll(`#diff-stage [data-qid="${qid}"]`).forEach((el) => el.classList.add("qid-hl"));
+  document.querySelectorAll(".diff-list .diff-row").forEach((row) => {
+    if (row.dataset.qid === qid) row.classList.add("active");
+  });
+}
+
+function diffHighlightCard(id, focus) {
+  diffClearHighlight();
+  const card = diffCardOf(id);
+  if (!card) return;
+  document.querySelectorAll("#diff-stage .cluster,.diff-pools .pool").forEach((el) => {
+    if (el === card) el.classList.add("related");
+    else el.classList.add("dimmed");
+  });
+  if (focus) card.classList.add("focus");
+  document.querySelectorAll(".diff-list .diff-row").forEach((row) => {
+    if (row.dataset.card === id) row.classList.add("active");
+  });
+}
+
+function diffCardOf(id) {
+  return document.querySelector(`#diff-stage [data-card="${id}"], .diff-pools [data-card="${id}"]`);
+}
+
+function diffPanToCard(id) {
+  const card = diffCardOf(id);
+  if (!card || card.classList.contains("pool") || id === "PENDING" || id === "TRASH") return;
+  const wrap = $("diff-wrap").getBoundingClientRect();
+  const left = card.offsetLeft * diffZoom + diffPanX;
+  const top = card.offsetTop * diffZoom + diffPanY;
+  const width = card.offsetWidth * diffZoom;
+  const height = card.offsetHeight * diffZoom;
+  let nextX = diffPanX;
+  let nextY = diffPanY;
+  if (left < 20 || left + width > wrap.width - 20) {
+    nextX = diffPanX + (wrap.width / 2 - (left + width / 2));
+  }
+  if (top < 20 || top + height > wrap.height - 20) {
+    nextY = diffPanY + (wrap.height / 2 - (top + height / 2));
+  }
+  if (nextX !== diffPanX || nextY !== diffPanY) {
+    diffPanX = nextX;
+    diffPanY = nextY;
+    diffApplyTransform(true);
+  }
+}
+
+function diffLocation(state, qid) {
+  for (const cluster of state.clusters || []) {
+    if (cluster.members.includes(qid)) return {kind: "cluster", id: cluster.cluster_id};
+  }
+  if ((state.pending || []).includes(qid)) return {kind: "pending", id: "PENDING"};
+  if ((state.trash || []).includes(qid)) return {kind: "trash", id: "TRASH"};
+  return {kind: "missing", id: ""};
+}
+
+function diffName(state, qid) {
+  const location = diffLocation(state, qid);
+  if (location.kind === "cluster") {
+    const cluster = (state.clusters || []).find((item) => item.cluster_id === location.id);
+    return cluster ? (cluster.name || location.id) : location.id;
+  }
+  if (location.kind === "pending") return "待定";
+  if (location.kind === "trash") return "不可聚类";
+  return "未保留";
+}
+
+function diffShowBubble(qid) {
+  const target = targetData || DATA;
+  const bubble = $("diff-bubble");
+  bubble.textContent = `${qid} · 最终归属：${diffName(target, qid)}`;
+  bubble.classList.add("show");
+  clearTimeout(diffShowBubble.timer);
+  diffShowBubble.timer = setTimeout(() => bubble.classList.remove("show"), 1800);
+}
+
+function diffSelectQid(qid) {
+  diffPin = qid;
+  diffHighlight(qid, true);
+  const target = targetData || DATA;
+  const location = diffLocation(target, qid);
+  if (location.kind === "cluster") diffPanToCard(location.id);
+  else {
+    const pool = diffCardOf(location.id);
+    if (pool) {
+      document.querySelectorAll("#diff-stage .cluster,.diff-pools .pool").forEach((el) => el.classList.remove("focus"));
+      pool.classList.add("focus");
+    }
+  }
+  diffShowBubble(qid);
+}
+
+function diffSelectCard(id) {
+  diffPin = null;
+  diffHighlightCard(id, true);
+  diffPanToCard(id);
+}
+
+function diffClearPin() {
+  diffPin = null;
+  diffClearHighlight();
+  $("diff-bubble").classList.remove("show");
+}
+
+function diffBuildCard(item, target, base, deleted) {
+  const card = document.createElement("section");
+  card.className = "cluster" + (deleted ? " deleted" : item.status === "new" ? " new" : "");
+  card.dataset.card = item.cluster_id;
+  const head = document.createElement("div");
+  head.className = "chead";
+  const badge = document.createElement("span");
+  badge.className = "badge" + (deleted ? " deleted" : item.status === "new" ? " new" : "");
+  badge.textContent = item.cluster_id;
+  const name = document.createElement("h3");
+  name.textContent = item.name || "未命名";
+  const old = document.createElement("span");
+  old.className = "oldname";
+  old.textContent = deleted ? "已删除" : item.before_name && item.before_name !== item.name
+    ? `原：${item.before_name}` : item.status === "new" ? "新建" : "";
+  const delta = document.createElement("span");
+  delta.className = "delta";
+  if (!deleted) {
+    if (item.added.length) {
+      const add = document.createElement("span");
+      add.className = "add";
+      add.textContent = `+${item.added.length}`;
+      delta.append(add);
+    }
+    if (item.removed.length) {
+      const remove = document.createElement("span");
+      remove.className = "remove";
+      remove.textContent = `-${item.removed.length}`;
+      delta.append(remove);
+    }
+  }
+  head.append(badge, name, old, delta);
+
+  const chips = document.createElement("div");
+  chips.className = "chips";
+  if (deleted) {
+    for (const qid of item.members) {
+      chips.append(diffCanvasChip(qid, (base.queries[qid] || {}).text || qid, "removed"));
+    }
+  } else {
+    const added = new Set(item.added || []);
+    for (const qid of item.members) {
+      const text = (target.queries[qid] || {}).text || qid;
+      chips.append(diffCanvasChip(qid, text, added.has(qid) ? "added" : ""));
+    }
+    for (const qid of item.removed || []) {
+      const text = (base.queries[qid] || {}).text || qid;
+      chips.append(diffCanvasChip(qid, text, "removed"));
+    }
+  }
+  card.append(head, chips);
+  return card;
+}
+
+function diffBuildPools(target, diffData) {
+  const pools = $("diff-pools");
+  pools.innerHTML = "";
+  for (const [key, id, label] of [["pending", "PENDING", "待定"], ["trash", "TRASH", "不可聚类"]]) {
+    const pool = document.createElement("div");
+    pool.className = "pool" + (key === "trash" ? " trash" : "");
+    pool.dataset.card = id;
+    const head = document.createElement("div");
+    head.className = "phead";
+    head.textContent = label;
+    const count = document.createElement("span");
+    count.className = "pcount";
+    count.textContent = (target[key] || []).length;
+    head.append(count);
+    const chips = document.createElement("div");
+    chips.className = "chips";
+    const added = new Set((diffData[key] || {}).added || []);
+    for (const qid of target[key] || []) {
+      chips.append(diffCanvasChip(qid, (target.queries[qid] || {}).text || qid, added.has(qid) ? "added" : ""));
+    }
+    pool.append(head, chips);
+    pools.append(pool);
+  }
+}
+
+function diffBuildSidebar(diffData) {
+  const list = $("diff-list");
+  list.innerHTML = "";
+  const groups = [
+    ["move", "移动", diffData.moves.map((item) => ({
+      type: "qid", id: item.qid, icon: "g", title: `${item.qid} ${item.text}`,
+      sub: `${locationName(item.from)} → ${locationName(item.to)}`,
+    }))],
+    ["rename", "改名", diffData.renames.map((item) => ({
+      type: "card", id: item.cluster_id, icon: "b", title: `${item.cluster_id} ${item.from || "未命名"} → ${item.to || "未命名"}`,
+      sub: "名称变化",
+    }))],
+    ["create", "新建", diffData.created.map((item) => ({
+      type: "card", id: item.cluster_id, icon: "b", title: `${item.cluster_id} ${item.name || "未命名"}`,
+      sub: `${item.members.length} 个成员`,
+    }))],
+    ["delete", "删除", diffData.deleted.map((item) => ({
+      type: "card", id: item.cluster_id, icon: "r", title: `${item.cluster_id} ${item.name || "未命名"}`,
+      sub: `${item.members.length} 个成员已移出`,
+    }))],
+    ["pool", "待定 / 不可聚类", [
+      ...diffData.pending.added.map((qid) => ({type: "qid", id: qid, icon: "o", title: qid, sub: "加入待定"})),
+      ...diffData.pending.removed.map((qid) => ({type: "qid", id: qid, icon: "o", title: qid, sub: "离开待定"})),
+      ...diffData.trash.added.map((qid) => ({type: "qid", id: qid, icon: "gy", title: qid, sub: "加入不可聚类"})),
+      ...diffData.trash.removed.map((qid) => ({type: "qid", id: qid, icon: "gy", title: qid, sub: "离开不可聚类"})),
+    ]],
+    ["unmatched", "未匹配", [
+      ...diffData.unmatched.base.map((item) => ({type: "qid", id: item.qid, icon: "gy", title: `${item.qid} ${item.text}`, sub: "仅基准结果"})),
+      ...diffData.unmatched.target.map((item) => ({type: "qid", id: item.qid, icon: "gy", title: `${item.qid} ${item.text}`, sub: "仅对照结果"})),
+    ]],
+  ];
+  let total = 0;
+  for (const [type, title, rows] of groups) {
+    total += rows.length;
+    if (!rows.length) continue;
+    const group = document.createElement("div");
+    group.className = "diff-group";
+    group.dataset.type = type;
+    const head = document.createElement("div");
+    head.className = "diff-gtitle";
+    head.innerHTML = `<span>${title}</span><span>${rows.length}</span>`;
+    group.append(head);
+    for (const item of rows) {
+      const row = document.createElement("button");
+      row.className = "diff-row";
+      if (item.type === "qid") row.dataset.qid = item.id;
+      else row.dataset.card = item.id;
+      row.innerHTML = `<span class="icon ${item.icon}">${item.icon === "r" ? "×" : item.icon === "b" ? "✎" : "→"}</span>` +
+        `<span class="text"><b>${diffEsc(item.title)}</b><small>${diffEsc(item.sub)}</small></span>`;
+      row.addEventListener("mouseenter", () => {
+        if (diffPin) return;
+        if (item.type === "qid") diffHighlight(item.id, false);
+        else diffHighlightCard(item.id, false);
+      });
+      row.addEventListener("mouseleave", () => {
+        if (!diffPin) diffClearHighlight();
+      });
+      row.addEventListener("click", (event) => {
+        event.stopPropagation();
+        if (item.type === "qid") diffSelectQid(item.id);
+        else diffSelectCard(item.id);
+      });
+      group.append(row);
+    }
+    list.append(group);
+  }
+  $("diff-count").textContent = `共 ${total} 项 · 悬浮预览，点击定位`;
+  if (!total) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = "两份结果没有变化。";
+    list.append(empty);
+  }
+  document.querySelectorAll("[data-diff-filter]").forEach((button) => {
+    button.onclick = () => {
+      document.querySelectorAll("[data-diff-filter]").forEach((item) => item.classList.remove("active"));
+      button.classList.add("active");
+      const filter = button.dataset.diffFilter;
+      document.querySelectorAll(".diff-group").forEach((group) => {
+        group.style.display = filter === "all" || group.dataset.type === filter ? "" : "none";
+      });
+    };
+  });
+}
+
+function renderDiffCanvas() {
+  const target = targetData || DATA;
+  const base = baseData || initialData;
+  $("stage").textContent = "变更对比";
+  $("diff-summary").textContent = "";
+  $("diff-stage").innerHTML = "";
+  $("diff-pools").innerHTML = "";
+  $("diff-list").innerHTML = "";
+  if (!diffData || !target || !base) {
+    $("diff-count").textContent = "共 0 项 · 悬浮预览，点击定位";
+    $("diff-list").textContent = "选择基准结果后点“对比”；对照结果未选时使用当前状态。";
+    return;
+  }
+  $("stat-queries").textContent = Object.keys(target.queries || {}).length;
+  $("stat-clusters").textContent = diffData.clusters.length;
+  $("stat-pending").textContent = (target.pending || []).length;
+  $("stat-trash").textContent = (target.trash || []).length;
+  const summary = diffData.summary;
+  $("diff-summary").innerHTML = [
+    `<span class="pill">${summary.base_clusters} → ${summary.target_clusters} 簇</span>`,
+    `<span class="pill green">移动<b>${summary.moves}</b></span>`,
+    `<span class="pill blue">改名<b>${summary.renames}</b></span>`,
+    `<span class="pill blue">新建<b>${summary.created}</b></span>`,
+    `<span class="pill red">删除<b>${summary.deleted}</b></span>`,
+    `<span class="pill orange">待定<b>${summary.pending_added + summary.pending_removed}</b></span>`,
+    `<span class="pill">不可聚类<b>${summary.trash_added + summary.trash_removed}</b></span>`,
+  ].join("");
+
+  const cards = [
+    ...(onlyChanges ? diffData.clusters.filter((item) => item.status !== "unchanged") : diffData.clusters)
+      .map((item) => ({item, deleted: false})),
+    ...diffData.deleted.map((item) => ({
+      item: {...item, status: "deleted", added: [], removed: item.members, before_name: item.name},
+      deleted: true,
+    })),
+  ];
+  const columns = $("diff-wrap").clientWidth < 800 ? 2 : 3;
+  const gapX = 326;
+  const gapY = 290;
+  const stage = $("diff-stage");
+  stage.style.width = `${Math.max(632, columns * gapX + 20)}px`;
+  stage.style.height = `${Math.max(420, Math.ceil(cards.length / columns) * gapY + 40)}px`;
+  cards.forEach((entry, index) => {
+    const card = diffBuildCard(entry.item, target, base, entry.deleted);
+    card.style.left = `${20 + (index % columns) * gapX}px`;
+    card.style.top = `${100 + Math.floor(index / columns) * gapY}px`;
+    stage.append(card);
+  });
+  if (!cards.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.style.position = "absolute";
+    empty.style.left = "20px";
+    empty.style.top = "100px";
+    empty.textContent = "只看变化：两份结果没有需要展示的变化。";
+    stage.append(empty);
+  }
+  diffBuildPools(target, diffData);
+  diffBuildSidebar(diffData);
+  diffApplyTransform(false);
+}
+
+function renderDiff() {
+  renderDiffCanvas();
+}
+
 function render() {
+  if (mode === "diff") {
+    renderDiff();
+    return;
+  }
   if (!DATA) return;
   const clusters = DATA.clusters || [];
   $("stage").textContent = (DATA.meta && DATA.meta.stage) || "ReviewState";
@@ -328,7 +922,8 @@ function render() {
     }
     if (cluster.kind) {
       const kind = document.createElement("span");
-      kind.textContent = cluster.kind === "llm" ? "LLM 调整" : "自动聚类";
+      kind.textContent = cluster.kind === "llm" ? "LLM 调整"
+        : cluster.kind === "manual" ? "人工新建" : "自动聚类";
       meta.append(kind);
     }
 
@@ -342,7 +937,27 @@ function render() {
       chips.append(empty);
     }
 
-    card.append(head, meta, chips);
+    const fields = document.createElement("div");
+    fields.className = "fields";
+    const slug = document.createElement("input");
+    slug.placeholder = "slug";
+    slug.value = cluster.slug || "";
+    slug.addEventListener("change", async () => {
+      if (slug.value.trim() !== cluster.slug) {
+        await act({op: "update", cluster_id: cluster.cluster_id, slug: slug.value});
+      }
+    });
+    const keywords = document.createElement("input");
+    keywords.placeholder = "keywords";
+    keywords.value = cluster.keywords || "";
+    keywords.addEventListener("change", async () => {
+      if (keywords.value.trim() !== cluster.keywords) {
+        await act({op: "update", cluster_id: cluster.cluster_id, keywords: keywords.value});
+      }
+    });
+    fields.append(slug, keywords);
+
+    card.append(head, meta, chips, fields);
     bindDrop(card, cluster.cluster_id);
     grid.append(card);
   }
@@ -414,6 +1029,16 @@ $("create").addEventListener("click", async () => {
   toast("已新建空簇，把 query 拖进来");
 });
 
+$("park").addEventListener("click", async () => {
+  if (!selected.size) return;
+  const ok = await act({op: "park", qids: [...selected]});
+  if (ok) {
+    selected.clear();
+    updateSelection();
+    toast("已移到待定");
+  }
+});
+
 $("undo").addEventListener("click", () => stepHistory("undo"));
 $("redo").addEventListener("click", () => stepHistory("redo"));
 document.addEventListener("keydown", (event) => {
@@ -447,6 +1072,8 @@ $("file").addEventListener("change", async () => {
     });
     selected.clear();
     drafts = [];
+    initialData = JSON.parse(JSON.stringify(DATA));
+    if (!baseData) $("base-name").textContent = "当前初始状态";
     await refreshHistory();
     showError("");
     render();
@@ -457,6 +1084,109 @@ $("file").addEventListener("change", async () => {
     $("file").value = "";
   }
 });
+
+async function runDiff() {
+  const base = baseData || initialData;
+  if (!base) {
+    toast("先选择基准结果 JSON");
+    return;
+  }
+  const target = targetData || DATA;
+  try {
+    diffData = await request("/api/diff", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({base, target}),
+    });
+    diffZoom = 1;
+    diffPanX = 0;
+    diffPanY = 0;
+    showError("");
+    renderDiff();
+    toast("对比完成");
+  } catch (err) {
+    showError(err.message);
+    toast(err.message);
+  }
+}
+
+function setMode(next) {
+  mode = next;
+  document.body.classList.toggle("diff-mode", mode === "diff");
+  $("mode-review").classList.toggle("active", mode === "review");
+  $("mode-diff").classList.toggle("active", mode === "diff");
+  if (mode === "diff") renderDiff();
+  else render();
+}
+
+$("mode-review").addEventListener("click", () => setMode("review"));
+$("mode-diff").addEventListener("click", () => setMode("diff"));
+$("run-diff").addEventListener("click", runDiff);
+$("diff-only-changes").addEventListener("change", (event) => {
+  onlyChanges = event.target.checked;
+  if (mode === "diff" && diffData) renderDiff();
+});
+
+$("base-file").addEventListener("change", async () => {
+  const file = $("base-file").files[0];
+  if (!file) return;
+  try {
+    baseData = JSON.parse(await file.text());
+    $("base-name").textContent = file.name;
+    $("run-diff").disabled = false;
+    toast("已载入基准结果");
+  } catch (err) {
+    showError("基准结果 JSON 解析失败：" + err.message);
+  } finally {
+    $("base-file").value = "";
+  }
+});
+
+$("target-file").addEventListener("change", async () => {
+  const file = $("target-file").files[0];
+  if (!file) return;
+  try {
+    targetData = JSON.parse(await file.text());
+    $("target-name").textContent = file.name;
+    toast("已载入对照结果");
+  } catch (err) {
+    showError("对照结果 JSON 解析失败：" + err.message);
+  } finally {
+    $("target-file").value = "";
+  }
+});
+
+const diffWrap = $("diff-wrap");
+diffWrap.addEventListener("mousedown", (event) => {
+  if (event.target.closest(".cluster,.pool,button,.diff-row,.diff-zoom")) return;
+  diffDrag = {x: event.clientX, y: event.clientY, panX: diffPanX, panY: diffPanY, moved: false};
+  diffWrap.classList.add("dragging");
+});
+window.addEventListener("mousemove", (event) => {
+  if (!diffDrag) return;
+  const dx = event.clientX - diffDrag.x;
+  const dy = event.clientY - diffDrag.y;
+  if (Math.abs(dx) + Math.abs(dy) > 4) diffDrag.moved = true;
+  diffPanX = diffDrag.panX + dx;
+  diffPanY = diffDrag.panY + dy;
+  diffApplyTransform(false);
+});
+window.addEventListener("mouseup", () => {
+  if (!diffDrag) return;
+  const moved = diffDrag.moved;
+  diffDrag = null;
+  diffWrap.classList.remove("dragging");
+  if (!moved) diffClearPin();
+});
+$("diff-zoom-in").onclick = () => {
+  diffZoom = Math.min(1.4, diffZoom + 0.1);
+  diffApplyTransform(true);
+};
+$("diff-zoom-out").onclick = () => {
+  diffZoom = Math.max(0.4, diffZoom - 0.1);
+  diffApplyTransform(true);
+};
+$("diff-fit").onclick = diffFit;
 
 refresh();
 </script>

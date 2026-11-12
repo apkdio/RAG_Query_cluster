@@ -80,7 +80,7 @@ def apply_action(state: ReviewState, action: dict) -> ReviewState:
         if not isinstance(name, str):
             raise ActionError("create: name 必须是字符串")
         work.clusters[cluster_id] = Cluster(
-            cluster_id=cluster_id, name=name.strip(), members=qids, kind="llm",
+            cluster_id=cluster_id, name=name.strip(), members=qids, kind="manual",
         )
     elif op == "rename":
         cluster_id = action.get("cluster_id")
@@ -90,6 +90,20 @@ def apply_action(state: ReviewState, action: dict) -> ReviewState:
         if not isinstance(name, str) or not name.strip() or len(name.strip()) > 40:
             raise ActionError("rename: name 必须是 1–40 个字符")
         work.clusters[cluster_id].name = name.strip()
+    elif op == "update":
+        cluster_id = action.get("cluster_id")
+        cluster = work.clusters.get(cluster_id)
+        if cluster is None:
+            raise ActionError(f"未知 cluster_id {cluster_id}")
+        if "slug" not in action and "keywords" not in action:
+            raise ActionError("update: 至少提供 slug 或 keywords")
+        for field, limit in (("slug", 40), ("keywords", 120)):
+            if field not in action:
+                continue
+            value = action[field]
+            if not isinstance(value, str) or len(value.strip()) > limit:
+                raise ActionError(f"{field} 必须是 {limit} 字符以内的字符串")
+            setattr(cluster, field, value.strip())
     elif op == "delete":
         cluster_id = action.get("cluster_id")
         cluster = work.clusters.get(cluster_id)
@@ -107,6 +121,7 @@ def apply_action(state: ReviewState, action: dict) -> ReviewState:
     for cluster_id in list(work.clusters):
         if not work.clusters[cluster_id].members:
             del work.clusters[cluster_id]
+    work.meta["stage"] = "human"
     work.events.append(new_event("human_action", action=action))
     try:
         work.validate()

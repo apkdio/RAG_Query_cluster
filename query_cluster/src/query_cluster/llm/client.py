@@ -6,6 +6,19 @@ import json
 import os
 import urllib.error
 import urllib.request
+from pathlib import Path
+
+DEFAULT_CONFIG = Path(__file__).resolve().parents[3] / "config" / "llm.json"
+
+
+def load_config(path: Path | str | None = None) -> dict:
+    config_path = Path(path) if path else DEFAULT_CONFIG
+    if not config_path.exists():
+        return {}
+    payload = json.loads(config_path.read_text(encoding="utf-8-sig"))
+    if not isinstance(payload, dict):
+        raise LLMError(f"{config_path}: LLM 配置必须是对象")
+    return payload
 
 
 class LLMError(RuntimeError):
@@ -50,10 +63,14 @@ class LLMClient:
 
 
 def client_from_env(base_url: str | None = None, model: str | None = None,
-                    api_key_env: str = "LLM_API_KEY", timeout: int = 90) -> LLMClient:
+                    api_key_env: str | None = None, timeout: int | None = None,
+                    config_path: Path | str | None = None) -> LLMClient:
+    config = load_config(config_path)
+    key_env = api_key_env or config.get("api_key_env") or "LLM_API_KEY"
+    effective_timeout = timeout if timeout is not None else int(config.get("timeout", 90))
     return LLMClient(
-        base_url=base_url or os.environ.get("LLM_BASE_URL", ""),
-        model=model or os.environ.get("LLM_MODEL", ""),
-        api_key=os.environ.get(api_key_env),
-        timeout=timeout,
+        base_url=base_url or os.environ.get("LLM_BASE_URL") or str(config.get("base_url") or ""),
+        model=model or os.environ.get("LLM_MODEL") or str(config.get("model") or ""),
+        api_key=os.environ.get(key_env),
+        timeout=effective_timeout,
     )

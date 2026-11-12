@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-CLUSTER_KINDS = frozenset({"auto", "llm"})
+CLUSTER_KINDS = frozenset({"auto", "manual", "llm"})
 
 
 @dataclass

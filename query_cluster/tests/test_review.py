@@ -35,6 +35,15 @@ def test_move_last_member_removes_source_cluster():
     assert "C2" not in state.clusters
     assert state.location("Q0003") == ("cluster", "C1")
     assert state.clusters["C1"].cohesion is None
+    assert state.meta["stage"] == "human"
+
+
+def test_update_slug_and_keywords():
+    state = apply_action(sample_state(), {
+        "op": "update", "cluster_id": "C1", "slug": "price", "keywords": "价格,费用",
+    })
+    assert state.clusters["C1"].slug == "price"
+    assert state.clusters["C1"].keywords == "价格,费用"
 
 
 def test_move_to_pending_and_trash():
@@ -49,6 +58,7 @@ def test_create_rename_and_delete_empty_cluster():
         "op": "create", "qids": ["Q0003"], "name": "挑选技巧",
     })
     assert state.clusters["N1"].name == "挑选技巧"
+    assert state.clusters["N1"].kind == "manual"
     state = apply_action(state, {"op": "rename", "cluster_id": "C1", "name": "价格咨询"})
     assert state.clusters["C1"].name == "价格咨询"
     with pytest.raises(ActionError):
@@ -120,7 +130,7 @@ def test_http_review_api(tmp_path):
         assert exported["meta"]["stage"] == "human"
         assert exported["events"] == []
         persisted = json.loads(state_path.read_text(encoding="utf-8"))
-        assert persisted["meta"]["stage"] == "clustering"
+        assert persisted["meta"]["stage"] == "human"
         assert "C2" not in {cluster["cluster_id"] for cluster in persisted["clusters"]}
 
         load = Request(
