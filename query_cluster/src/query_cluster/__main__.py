@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 
 from .canvas import build_canvas
+from .clustering.pipeline import build_state, write_state
 from .llm import LLMError, client_from_env
 from .llm_review import DEFAULT_INSTRUCTIONS, LLMReviewError, review as llm_review, save_outputs
 from .manual import load_rules
@@ -26,6 +27,7 @@ def main(argv: list[str] | None = None) -> int:
     p_cluster.add_argument("--out", default=str(ROOT / "out"), help="输出目录")
     p_cluster.add_argument("--backend", choices=["auto", "ollama", "hash"], default="auto")
     p_cluster.add_argument("--rules", default=None, help="手动规则簇 JSON；命中的先归到指定类")
+    p_cluster.add_argument("--state", action="store_true", help="输出新的 ReviewState state.json")
 
     p_review = sub.add_parser("review", help="从已有 clusters.json 生成复核页")
     p_review.add_argument("--clusters", required=True)
@@ -52,9 +54,17 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.cmd == "cluster":
         raw = load_input(Path(args.input) if args.input else None, args.text)
+        out_dir = Path(args.out)
+        if args.state:
+            if args.rules:
+                parser.error("--state 暂不支持 --rules")
+            state = build_state(raw, backend=args.backend)
+            state_path = write_state(state, out_dir)
+            print(f"{len(state.queries)} 个词 -> {len(state.clusters)} 个簇")
+            print(f"状态：{state_path}")
+            return 0
         rules = load_rules(args.rules) if args.rules else None
         result = build_clusters(raw, backend=args.backend, rules=rules)
-        out_dir = Path(args.out)
         json_path = write_result(result, out_dir)
         html_path = build_canvas(result, out_dir / "review.html", key=out_dir.name)
         print(f"{result['meta']['count']} 个词 -> {result['meta']['clusters']} 个簇")
