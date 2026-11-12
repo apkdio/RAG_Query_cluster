@@ -2,7 +2,7 @@
 
 词表输入、自动聚类、LLM 初审与人工复核。
 
-当前 S1/S2 已落地 `entities/` 和 `preprocess/`、`clustering/`：输入支持归一化去重、QID 分配，并产出新的 `ReviewState`。旧 `cluster` 链路暂时保留，供现有复核页和 patch 使用。
+当前 S1/S2/S3 已落地 `entities/`、`preprocess/`、`clustering/` 和 `llm/`：输入支持归一化去重、QID 分配，自动聚类产出 `ReviewState`，LLM 分两阶段完成归类和命名。旧 `cluster` 链路暂时保留，供现有复核页和旧 patch 使用。
 
 ## 运行
 
@@ -13,6 +13,10 @@ $env:PYTHONPATH = "src"
 # 新状态链路：输出 state.json
 python -m query_cluster cluster `
   --input examples/inputs.txt --backend hash --state --out out
+
+# LLM 两阶段复核：归类 patch + 命名
+python -m query_cluster llm-review --state `
+  --clusters out/state.json --out out/llm
 
 # 旧链路：输出 clusters.json 和 review.html
 python -m query_cluster cluster `
@@ -35,6 +39,7 @@ query_cluster/
 │  ├─ entities/          Query / Cluster / ReviewState / QID / 事件
 │  ├─ preprocess/        归一化、去重、QID 分配
 │  ├─ clustering/        向量、平均链接、ReviewState 组装
+│  ├─ llm/              客户端、prompt、patch、两阶段复核
 │  ├─ pipeline.py        旧链路兼容入口
 │  └─ canvas.py          复核页注入
 ├─ templates/review.html
