@@ -1,0 +1,127 @@
+query_cluster/src/query_cluster/review/actions.py
+  s_1250751e5fa60e::t_2edbcf3c618c3e 124
+  s_1250751e5fa60e::t_367867de622a91 83
+  s_1250751e5fa60e::t_90a7b7fb08262d 98-99
+  s_1250751e5fa60e::t_b94a5dfc081451 93-97,100-106
+README.md
+  s_1250751e5fa60e::t_8e125101595b88 38,41,43,45-46,48,50
+  s_1250751e5fa60e::t_4446aeb6258f6f 8
+query_cluster/templates/review.html
+  s_1250751e5fa60e::t_3da8e27f72c27a 155-158
+  s_1250751e5fa60e::t_f5fc4be9abd2f9 500-510
+  s_1250751e5fa60e::t_addda88ce4d9d6 926
+  s_1250751e5fa60e::t_363389702f714a 35-44,51,60-66
+  s_1250751e5fa60e::t_72149c3f013f8f 1075-1076
+  s_1250751e5fa60e::t_fbd74f702ad55f 67-81,101-106,108-133
+  s_1250751e5fa60e::t_766f2be25c1eb3 810
+  s_1250751e5fa60e::t_2a6d1b05058c0e 220-241,243-247
+  s_1250751e5fa60e::t_0e3ac1007e86fb 452-457
+  s_1250751e5fa60e::t_07c80fbce2670d 856-864
+  s_1250751e5fa60e::t_8e9cb87d6b8bdc 242
+  s_1250751e5fa60e::t_7be4464b27033b 46-50
+  s_1250751e5fa60e::t_79086ff5febf49 198
+  s_1250751e5fa60e::t_78bba09164893a 249
+  s_1250751e5fa60e::t_a02df016e7663c 925
+  s_1250751e5fa60e::t_041a73ac17cc66 546-559
+  s_1250751e5fa60e::t_add4a660a064d5 773-775
+  s_1250751e5fa60e::t_5a234c1a1e756b 1089-1090,1099
+  s_1250751e5fa60e::t_ed63d8b65332dc 187-190,199-200,202-204,209,211,213,215-217
+  s_1250751e5fa60e::t_2be004c104ecf6 52-53
+  s_1250751e5fa60e::t_21a201be611744 1032-1041
+  s_1250751e5fa60e::t_fa0d4f3984d454 201
+  s_1250751e5fa60e::t_257037bed41d31 269,273
+  s_1250751e5fa60e::t_158d83a750c33b 1159-1188,1190
+  s_1250751e5fa60e::t_e822413c05ec53 849
+  s_1250751e5fa60e::t_5230c8ef0a694b 1088,1091-1098,1100,1104-1124,1129-1158
+  s_1250751e5fa60e::t_04d4fb5b73b200 1189
+  s_1250751e5fa60e::t_b398451bc22397 54-59
+  s_1250751e5fa60e::t_1b2ea8c45a8979 317-321
+  s_1250751e5fa60e::t_c22cfd662454c1 446-451,458-499,511,513-514,516-520,522-530,532-535,537-539,541-545,560,562-575,577-607,609-614,616-624,626,628-630,632-633,635-685,687,689,691,694-696,698-704,706-711,714-716,718-719,721,723-748,753-772,776-790,793-809,811-819,821-825,835-836,839-843,845-847,850-852,854-855,865-871
+  s_1250751e5fa60e::t_1e811904b41728 107
+  s_1250751e5fa60e::t_e4d013048b10dc 837-838
+  s_1250751e5fa60e::t_1328748146717b 940-960
+  s_1250751e5fa60e::t_5b8f261d970758 634
+  s_1250751e5fa60e::t_817dc847e7732c 45
+  s_1250751e5fa60e::t_ed05877834050d 210,212
+  s_1250751e5fa60e::t_af3d04c836e9fc 268,270-272
+  s_1250751e5fa60e::t_0f7f75160a3045 274-278
+  s_1250751e5fa60e::t_9c0066eef567fa 1125-1128
+  s_1250751e5fa60e::t_8ce5499d247dfd 749-752
+  s_1250751e5fa60e::t_0468339916a53c 1101-1103
+  s_1250751e5fa60e::t_35544c28821b7c 214
+  s_1250751e5fa60e::t_872938753e3aa9 412-413
+  s_1250751e5fa60e::t_395516eab6dd52 576,608,615,627,631,686,688,690,692-693,697,705,712-713,717,720,722,791-792,820,872-873,875-878
+  s_1250751e5fa60e::t_e277661c105590 826-834
+  s_1250751e5fa60e::t_cba747692d290a 844,848
+  s_1250751e5fa60e::t_cb5c6ebffa6641 853
+query_cluster/src/query_cluster/entities/cluster.py
+  s_1250751e5fa60e::t_3cce7e33a71d23 7
+query_cluster/src/query_cluster/llm/review.py
+  s_1250751e5fa60e::t_e0bea7ecd30b0b 9,12
+  s_1250751e5fa60e::t_5710b8bd30e1a2 148
+query_cluster/tests/test_diff.py
+  s_1250751e5fa60e::t_bc6e8f7f814e4c 70-80,82-84
+  s_1250751e5fa60e::t_a23aad24c96ad7 54-57
+  s_1250751e5fa60e::t_b9ca5f5e2e0e9c 1-11,19-53,58-69,81
+  s_1250751e5fa60e::t_f56d892c7758c7 12-18
+query_cluster/tests/test_llm_client.py
+  s_1250751e5fa60e::t_11fd85a4a272c7 1-30
+query_cluster/src/query_cluster/review/diff.py
+  s_1250751e5fa60e::t_8b4e5e196c937b 1-98,100-147
+  s_1250751e5fa60e::t_186871c4c1d52f 99
+query_cluster/src/query_cluster/review/server.py
+  s_1250751e5fa60e::t_3e4e261634a88a 169-175
+  s_1250751e5fa60e::t_e4d0c1b011a0a8 10,12
+  s_1250751e5fa60e::t_0d6978312ff5eb 113
+  s_1250751e5fa60e::t_c9301d93752b5d 129
+  s_1250751e5fa60e::t_5fb433238c1576 14
+query_cluster/README.md
+  s_1250751e5fa60e::t_c349b066f8010d 5
+  s_1250751e5fa60e::t_feb73b2062ee27 13,15,17,19,21-22
+query_cluster/tests/test_state_pipeline.py
+  s_1250751e5fa60e::t_6d9f4851f30de7 48-54
+query_cluster/src/query_cluster/llm/client.py
+  s_1250751e5fa60e::t_07e9588122022f 66-70,72-75
+  s_1250751e5fa60e::t_fb8758a081c099 9-21
+query_cluster/src/query_cluster/clustering/pipeline.py
+  s_1250751e5fa60e::t_08cff8bce4b009 56-59,64-65,70,72-77
+query_cluster/tests/test_review.py
+  s_1250751e5fa60e::t_55791e44ef5dd7 133
+  s_1250751e5fa60e::t_df441c6e51ebbb 61
+  s_1250751e5fa60e::t_2db2007ddb13c9 38-46
+query_cluster/src/query_cluster/state_files.py
+  s_1250751e5fa60e::t_df8522fbee32b4 1-5
+query_cluster/tests/test_entities.py
+  s_1250751e5fa60e::t_cd32f3b9f6d185 114-117
+  s_1250751e5fa60e::t_3ffbed87c8425a 120,123
+  s_1250751e5fa60e::t_5f671922e7f2b5 4
+  s_1250751e5fa60e::t_c6fcec162eb989 124
+query_cluster/src/query_cluster/review/__init__.py
+  s_1250751e5fa60e::t_c26ea5b66d6ff5 4,7
+query_cluster/src/query_cluster/__main__.py
+  s_1250751e5fa60e::t_51d2ab5424db65 39
+  s_1250751e5fa60e::t_e59f68118c00f8 77
+  s_1250751e5fa60e::t_4dc4aef150e057 24
+  s_1250751e5fa60e::t_f967f852267495 57-58
+  s_1250751e5fa60e::t_4012f3e48659d5 64-65
+  s_1250751e5fa60e::t_f20e9a6fcdea8a 46
+  s_1250751e5fa60e::t_39c2503f7b6173 104
+query_cluster/tests/test_llm_state.py
+  s_1250751e5fa60e::t_b834cbb8185b22 188
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "cdd14c07264f0383f5ff26a0988a33d25e524773",
+  "prompts": {},
+  "sessions": {
+    "s_1250751e5fa60e": {
+      "agent_id": {
+        "tool": "chengxiaobang",
+        "id": "s_bd3qkvb2jhxu",
+        "model": "DeepSeek-V4.1-Flash"
+      },
+      "human_author": "apkdio <apkdio@163.com>"
+    }
+  }
+}
