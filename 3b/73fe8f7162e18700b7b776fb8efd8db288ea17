@@ -1,0 +1,41 @@
+README.md
+  s_1250751e5fa60e::t_0e2a7ca3c80eb2 8
+query_cluster/src/query_cluster/llm/patch.py
+  s_1250751e5fa60e::t_36f21fa3f314f7 34
+  s_1250751e5fa60e::t_9ff7bc06475702 1-33,35-60,63-64,66-188
+  s_1250751e5fa60e::t_7de3e30fb76c76 61-62,65
+query_cluster/src/query_cluster/llm/__init__.py
+  s_1250751e5fa60e::t_77b77eef54bdb9 1-18
+query_cluster/src/query_cluster/llm/prompts.py
+  s_1250751e5fa60e::t_5f4886b7dae521 1-66
+query_cluster/README.md
+  s_1250751e5fa60e::t_bf343493c14597 17-20
+  s_1250751e5fa60e::t_1e5fbcb6423f9e 42
+  s_1250751e5fa60e::t_a1ea22c6849613 5
+query_cluster/src/query_cluster/llm/review.py
+  s_1250751e5fa60e::t_2238a3850e03b5 1-161
+query_cluster/src/query_cluster/__main__.py
+  s_1250751e5fa60e::t_4da0c4af6d4a12 95-120
+  s_1250751e5fa60e::t_0757e66948f661 50,52-53
+  s_1250751e5fa60e::t_8fb34e73089c9a 11,13-18
+query_cluster/tests/test_llm_state.py
+  s_1250751e5fa60e::t_78014a2200e48d 104-106
+  s_1250751e5fa60e::t_069eae01a8fbaa 93-97
+  s_1250751e5fa60e::t_a5344c85d02946 1-92,98-103,107-189
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "3b73fe8f7162e18700b7b776fb8efd8db288ea17",
+  "prompts": {},
+  "sessions": {
+    "s_1250751e5fa60e": {
+      "agent_id": {
+        "tool": "chengxiaobang",
+        "id": "s_bd3qkvb2jhxu",
+        "model": "DeepSeek-V4.1-Flash"
+      },
+      "human_author": "apkdio <apkdio@163.com>"
+    }
+  }
+}
