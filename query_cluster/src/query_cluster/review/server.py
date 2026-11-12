@@ -9,12 +9,13 @@ from urllib.parse import urlparse
 
 from ..clustering.pipeline import write_state_file
 from ..entities.state import ReviewState, StateError
+from ..paths import TEMPLATES_DIR
 from ..state_files import HUMAN_STATE
 from .actions import ActionError, apply_action
 from .diff import diff_states
 from .export import export_dict
 
-DEFAULT_TEMPLATE = Path(__file__).resolve().parents[3] / "templates" / "review.html"
+DEFAULT_TEMPLATE = TEMPLATES_DIR / "review.html"
 
 
 def make_server(state: ReviewState, state_path: Path | str,

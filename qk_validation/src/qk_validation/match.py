@@ -4,16 +4,16 @@
 
 用法：
     # 1) 匹配：这条 query 会被哪个节点接住
-    python -m qk_validation.qk_query "怎么使用" --s 1
+    python -m qk_validation.match "怎么使用" --s 1
 
     # 2) 临时加一条 K，看排名变化（不写文件）
-    python -m qk_validation.qk_query "如何查看说明" --s 1 --slug node_1 --add-key "说明在哪里看"
+    python -m qk_validation.match "如何查看说明" --s 1 --slug node_1 --add-key "说明在哪里看"
 
     # 3) 确认要加，落盘
-    python -m qk_validation.qk_query "如何查看说明" --s 1 --slug node_1 --add-key "说明在哪里看" --save
+    python -m qk_validation.match "如何查看说明" --s 1 --slug node_1 --add-key "说明在哪里看" --save
 
     # 4) 看词表相对 raw 改了什么
-    python -m qk_validation.qk_query "怎么使用" --s 1 --diff
+    python -m qk_validation.match "怎么使用" --s 1 --diff
 
 口径：稠密 = bge-m3 cosine；关键词 = tf-idf 稀疏余弦 × 词覆盖率；
 score = 1/(60+稠密位次) + 1/(60+关键词位次)，关键词需过该来源阈值才算进列表。
@@ -29,8 +29,8 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-from .qk_diff import load_keys
-from .relevance_matrix import cosine, embed_batch, set_backend, tokenize
+from .table import load_keys
+from .relevance import cosine, embed_batch, set_backend, tokenize
 
 RRF_K = 60
 BASE = Path(__file__).resolve().parents[2]
@@ -159,8 +159,8 @@ def save_key(path: str, slug: str, text: str) -> None:
 
 
 def compact_diff(keys_path: str, base_path: str) -> None:
-    from qk_diff import diff_slug
-    from qk_diff import load_keys as load
+    from .table import diff_slug
+    from .table import load_keys as load
 
     _, base_items = load(base_path)
     _, cur_items = load(keys_path)

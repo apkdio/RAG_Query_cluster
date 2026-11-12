@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from .qk_query import main
+from .cli import main
 
 
 if __name__ == "__main__":

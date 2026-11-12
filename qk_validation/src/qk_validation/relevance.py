@@ -1,4 +1,4 @@
-﻿"""Query × Key 相关性矩阵（知识库召回口径 demo）。
+"""Query × Key 相关性矩阵（知识库召回口径 demo）。
 
 纯标准库实现：不依赖 numpy / jieba（装了 jieba 会自动用，没装退回中文 bigram 分词）。
 
@@ -9,22 +9,22 @@
 
 用法：
     # 临时对比（不写配置）
-    python relevance_matrix.py query "因天气要求改期" key "说明：不可转让、不可退款"
+    python relevance.py query "因天气要求改期" key "说明：不可转让、不可退款"
 
     # 多 key / 多 query
-    python relevance_matrix.py query "Q1" query "Q2" key "K1" key "K2" key "K3"
+    python relevance.py query "Q1" query "Q2" key "K1" key "K2" key "K3"
 
     # 持久化配置
-    python relevance_matrix.py add query "因天气要求改期"
-    python relevance_matrix.py add key "规则：取消后的处理方式"
-    python relevance_matrix.py add key "文本" --id my_key
-    python relevance_matrix.py clear query
-    python relevance_matrix.py clear keys
-    python relevance_matrix.py                      # 跑 config.json 矩阵
+    python relevance.py add query "因天气要求改期"
+    python relevance.py add key "规则：取消后的处理方式"
+    python relevance.py add key "文本" --id my_key
+    python relevance.py clear query
+    python relevance.py clear keys
+    python relevance.py                      # 跑 config.json 矩阵
 
     # 其他
-    python relevance_matrix.py --self-check         # 校验 RRF 公式
-    python relevance_matrix.py --config c.json --normalize
+    python relevance.py --self-check         # 校验 RRF 公式
+    python relevance.py --config c.json --normalize
 
 注意：
 - 稠密通道默认用「哈希 n-gram」占位（离线可跑，非语义向量）。
@@ -447,7 +447,7 @@ def cmd_pair(argv: list[str]) -> int:
             i += 1
 
     if not qs or not ks:
-        print('用法: python relevance_matrix.py query "你的问题" key "候选文本"')
+        print('用法: python relevance.py query "你的问题" key "候选文本"')
         return 2
 
     embeddings = _load_embeddings(emb_path) if emb_path else None

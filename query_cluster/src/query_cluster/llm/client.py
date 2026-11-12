@@ -8,7 +8,9 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-DEFAULT_CONFIG = Path(__file__).resolve().parents[3] / "config" / "llm.json"
+from ..paths import CONFIG_DIR
+
+DEFAULT_CONFIG = CONFIG_DIR / "llm.json"
 
 
 def load_config(path: Path | str | None = None) -> dict:

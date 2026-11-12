@@ -2,7 +2,7 @@
 
 词表输入、自动聚类、LLM 初审与人工复核。
 
-当前 S1/S2/S3/S4/S5 已完成：`entities/`、`preprocess/`、`clustering/`、`llm/` 和 `review/` 已落地；同一次 run 的算法、LLM、人工结果分别写成 `state.clustering.json`、`state.llm.json`、`state.human.json`，复核页统一加载 JSON。旧 `cluster` 链路暂时保留，供旧复核页和旧 patch 使用。
+当前 S0–S7 已完成：`entities/`、`preprocess/`、`clustering/`、`llm/`、`review/`、`tools/` 已落地；同一次 run 的算法、LLM、人工结果分别写成 `state.clustering.json`、`state.llm.json`、`state.human.json`，复核页统一加载 JSON。
 
 ## 运行
 
@@ -10,23 +10,20 @@
 cd query_cluster
 $env:PYTHONPATH = "src"
 
-# 新状态链路：输出 state.clustering.json
+# 算法结果：输出 state.clustering.json
 python -m query_cluster cluster `
-  --input examples/inputs.txt --backend hash --state --out out/run1
+  --input examples/inputs.txt --backend hash --out out/run1
 
 # LLM 两阶段复核：state.llm.json 写回同一个 run 目录
-python -m query_cluster llm-review --state `
-  --clusters out/run1/state.clustering.json --out out/run1
+python -m query_cluster llm-review `
+  --state out/run1/state.clustering.json --out out/run1
 
 # 本地复核服务：加载任意阶段 JSON
 python -m query_cluster serve --state out/run1/state.llm.json --port 8765
 
-# 旧链路：输出 clusters.json 和 review.html
-python -m query_cluster cluster `
-  --input examples/inputs.txt --backend hash --out out
-
-# 重新生成复核页
-python -m query_cluster review --clusters out/clusters.json --out out/review.html
+# 旧 clusters.json 迁移
+python -m query_cluster migrate `
+  --input old/clusters.json --out out/run1/state.clustering.json
 
 # 在仓库根目录测试
 uv run --package query-cluster python -m pytest -q
@@ -42,9 +39,11 @@ query_cluster/
 │  ├─ entities/          Query / Cluster / ReviewState / QID / 事件
 │  ├─ preprocess/        归一化、去重、QID 分配
 │  ├─ clustering/        向量、平均链接、ReviewState 组装
-│  ├─ llm/              客户端、prompt、patch、两阶段复核
-│  ├─ pipeline.py        旧链路兼容入口
-│  └─ canvas.py          复核页注入
+│  ├─ llm/               客户端、prompt、patch、两阶段复核
+│  ├─ review/            复核动作、导出、diff、本地服务
+│  ├─ tools/             旧结果迁移
+│  ├─ paths.py           包内路径入口
+│  └─ state_files.py     统一 state 文件名
 ├─ templates/review.html
 ├─ tests/
 ├─ examples/

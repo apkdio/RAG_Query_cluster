@@ -24,9 +24,9 @@ flowchart LR
 
 | 文件 | 用途 |
 |---|---|
-| `src/qk_validation/qk_query.py` | 单条 query 的节点打分与命中检查 |
-| `src/qk_validation/qk_diff.py` | 词表 diff：新增/删除/改写的 key（含词表读取） |
-| `src/qk_validation/relevance_matrix.py` | BM25 / 向量 / RRF 位次融合的本地实现 |
+| `src/qk_validation/match.py` | 单条 query 的节点打分与命中检查 |
+| `src/qk_validation/table.py` | 词表 diff：新增/删除/改写的 key（含词表读取） |
+| `src/qk_validation/relevance.py` | BM25 / 向量 / RRF 位次融合的本地实现 |
 | `config/qk_config.json` | 来源与关键词阈值 |
 | `data/` | 词表、基准快照、本地样本（不入 Git） |
 | `temp/` | 临时调试脚本（不入 Git） |
@@ -50,9 +50,9 @@ flowchart LR
 
 ```powershell
 # 在仓库根目录
-uv run --project qk_validation python -m qk_validation.qk_query "你的问题" --s 1
-uv run --project qk_validation python -m qk_validation.qk_diff
-uv run --project qk_validation python -m qk_validation.relevance_matrix --self-check
+uv run --project qk_validation python -m qk_validation.match "你的问题" --s 1
+uv run --project qk_validation python -m qk_validation.table
+uv run --project qk_validation python -m qk_validation.relevance --self-check
 ```
 
 `--s` 可以写来源序号或名称，默认取 `config/qk_config.json` 的 `default_source`；阈值也在这里配置。

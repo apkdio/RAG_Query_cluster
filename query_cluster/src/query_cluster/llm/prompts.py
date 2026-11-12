@@ -7,8 +7,9 @@ import re
 from pathlib import Path
 
 from ..entities.state import ReviewState
+from ..paths import PROMPTS_DIR
 
-DEFAULT_PROMPT_DIR = Path(__file__).resolve().parents[3] / "prompts"
+DEFAULT_PROMPT_DIR = PROMPTS_DIR
 PLACEHOLDER = re.compile(r"\{\{[A-Z0-9_]+\}\}")
 
 

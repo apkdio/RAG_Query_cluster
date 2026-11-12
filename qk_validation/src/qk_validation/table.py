@@ -1,11 +1,11 @@
-﻿"""对比两份 QK 词表，定位「新增 / 删除 / 修改」了哪些问句。
+"""对比两份 QK 词表，定位「新增 / 删除 / 修改」了哪些问句。
 
 典型用法：先在 data/qk_keys.json 里手动改（模拟改完的效果），再和 raw 版本对比。
 
-    python -m qk_validation.qk_diff                          # 默认 base=data/qk_corpus.json, current=data/qk_keys.json
-    python -m qk_validation.qk_diff --base raw.json --current data/qk_keys.json
-    python -m qk_validation.qk_diff --json
-    python -m qk_validation.qk_diff --threshold 0.6          # 判定「修改」的相似度阈值（默认 0.4）
+    python -m qk_validation.table                          # 默认 base=data/qk_corpus.json, current=data/qk_keys.json
+    python -m qk_validation.table --base raw.json --current data/qk_keys.json
+    python -m qk_validation.table --json
+    python -m qk_validation.table --threshold 0.6          # 判定「修改」的相似度阈值（默认 0.4）
 
 判定规则：
 - 同一 slug 下，问句原文比对：多了 = 新增，少了 = 删除
