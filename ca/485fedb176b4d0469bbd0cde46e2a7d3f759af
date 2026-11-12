@@ -1,0 +1,22 @@
+README.md
+  s_1250751e5fa60e::t_c5a0b64ecc39b0 8,13
+  s_1250751e5fa60e::t_a8dfcacd9195f8 12,28-30
+query_cluster/README.md
+  s_1250751e5fa60e::t_206bb14c50a451 20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "ca485fedb176b4d0469bbd0cde46e2a7d3f759af",
+  "prompts": {},
+  "sessions": {
+    "s_1250751e5fa60e": {
+      "agent_id": {
+        "tool": "chengxiaobang",
+        "id": "s_bd3qkvb2jhxu",
+        "model": "DeepSeek-V4.1-Flash"
+      },
+      "human_author": null
+    }
+  }
+}
