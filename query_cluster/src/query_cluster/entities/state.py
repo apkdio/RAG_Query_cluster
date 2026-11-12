@@ -83,7 +83,7 @@ class ReviewState:
                 not isinstance(cluster.cohesion, (int, float)) or isinstance(cluster.cohesion, bool)
             ):
                 errors.append(f"{cluster_id} 的 cohesion 必须是数字或 None")
-            for field_name in ("label", "slug", "keywords"):
+            for field_name in ("slug", "keywords"):
                 if not isinstance(getattr(cluster, field_name), str):
                     errors.append(f"{cluster_id} 的 {field_name} 必须是字符串")
             if not isinstance(cluster.no_action, bool):
@@ -133,7 +133,6 @@ class ReviewState:
                     "kind": cluster.kind,
                     "cohesion": cluster.cohesion,
                     "members": list(cluster.members),
-                    "label": cluster.label,
                     "no_action": cluster.no_action,
                     "slug": cluster.slug,
                     "keywords": cluster.keywords,
@@ -184,7 +183,6 @@ class ReviewState:
                 members=list(members),
                 kind=raw.get("kind", "auto"),
                 cohesion=raw.get("cohesion"),
-                label=raw.get("label", ""),
                 no_action=raw.get("no_action", False),
                 slug=raw.get("slug", ""),
                 keywords=raw.get("keywords", ""),

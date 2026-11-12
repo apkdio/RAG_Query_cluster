@@ -14,7 +14,7 @@ from query_cluster.entities import (
 def make_state() -> ReviewState:
     return ReviewState(
         queries={
-            "Q0001": Query("Q0001", "苹果多少钱", 2),
+            "Q0001": Query("Q0001", "苹果多少钱"),
             "Q0002": Query("Q0002", "香蕉价格"),
             "Q0003": Query("Q0003", "橙子怎么挑"),
             "Q0004": Query("Q0004", "附近水果店"),
@@ -30,16 +30,14 @@ def make_state() -> ReviewState:
 
 
 def test_query_roundtrip_and_validation():
-    query = Query("Q0001", "苹果多少钱", 2)
-    assert query.to_dict() == {"text": "苹果多少钱", "count": 2}
+    query = Query("Q0001", "苹果多少钱")
+    assert query.to_dict() == {"text": "苹果多少钱"}
     assert Query.from_dict("Q0001", query.to_dict()) == query
 
     with pytest.raises(ValueError):
         Query("Q1", "苹果").validate()
     with pytest.raises(ValueError):
         Query("Q0001", "  ").validate()
-    with pytest.raises(ValueError):
-        Query("Q0001", "苹果", 0).validate()
 
 
 def test_qid_allocation_is_monotonic():
@@ -63,8 +61,10 @@ def test_state_roundtrip():
     state = make_state()
     payload = state.to_dict()
     assert payload["version"] == 1
-    assert payload["queries"]["Q0001"] == {"text": "苹果多少钱", "count": 2}
+    assert payload["queries"]["Q0001"] == {"text": "苹果多少钱"}
+    assert "count" not in payload["queries"]["Q0001"]
     assert payload["clusters"][0]["members"] == ["Q0001", "Q0002"]
+    assert "label" not in payload["clusters"][0]
     assert payload["pending"] == ["Q0003"]
     assert payload["trash"] == ["Q0004"]
 

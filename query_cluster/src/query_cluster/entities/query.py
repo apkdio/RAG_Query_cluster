@@ -15,25 +15,22 @@ class Query:
 
     qid: str
     text: str
-    count: int = 1
 
     def validate(self) -> None:
         if not isinstance(self.qid, str) or not QID_PATTERN.fullmatch(self.qid):
             raise ValueError(f"QID 格式非法：{self.qid!r}，应为 Q0001 形式")
         if not isinstance(self.text, str) or not self.text.strip():
             raise ValueError(f"{self.qid} 的 text 不能为空")
-        if not isinstance(self.count, int) or isinstance(self.count, bool) or self.count < 1:
-            raise ValueError(f"{self.qid} 的 count 必须是正整数")
 
     def to_dict(self) -> dict:
         self.validate()
-        return {"text": self.text, "count": self.count}
+        return {"text": self.text}
 
     @classmethod
     def from_dict(cls, qid: str, payload: dict) -> "Query":
         if not isinstance(payload, dict):
             raise ValueError(f"{qid} 的 payload 必须是对象")
-        query = cls(qid=qid, text=payload.get("text", ""), count=payload.get("count", 1))
+        query = cls(qid=qid, text=payload.get("text", ""))
         query.validate()
         return query
 

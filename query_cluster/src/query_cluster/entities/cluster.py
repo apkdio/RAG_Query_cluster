@@ -16,7 +16,6 @@ class Cluster:
     members: list[str] = field(default_factory=list)
     kind: str = "auto"
     cohesion: float | None = None
-    label: str = ""
     no_action: bool = False
     slug: str = ""
     keywords: str = ""
