@@ -2,12 +2,10 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .venv/
-
-# IDE
 .idea/
-
-# 运行产物与本地数据
-out/
-temp/
-data/
 .env
+temp/
+**/data/
+**/out/
+**/config/*.json
+!**/config/*.example.json

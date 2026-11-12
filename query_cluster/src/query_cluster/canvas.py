@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-TEMPLATE = Path(__file__).resolve().parents[1] / "templates" / "review.html"
+TEMPLATE = Path(__file__).resolve().parents[2] / "templates" / "review.html"
 
 
 def build_canvas(result: dict, out_path: Path, title: str | None = None, key: str = "review") -> Path:
@@ -21,14 +21,15 @@ def build_canvas(result: dict, out_path: Path, title: str | None = None, key: st
             if label:
                 themes[term["text"]] = label
         manual_name = cluster.get("name") if cluster.get("kind") == "manual" else ""
+        cohesion = cluster.get("cohesion")
         clusters.append({
             "id": f"{idx:04d}",
             "theme": manual_name,
-            "meta": f'{len(texts)} 条 / 内聚 {cluster.get("cohesion", "—")}',
+            "meta": f'{len(texts)} 条 / 内聚 {cohesion if cohesion is not None else "—"}',
             "core": texts,
             "calls": [term.get("count", 1) for term in cluster["terms"]],
             "users": None,
-            "cohesion": cluster.get("cohesion"),
+            "cohesion": cohesion,
             "out": [],
             "in": [],
         })

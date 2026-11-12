@@ -1,0 +1,17 @@
+[project]
+name = "qk-validation"
+version = "0.1.0"
+description = "QK 词表匹配与召回验证"
+requires-python = ">=3.10"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/qk_validation"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

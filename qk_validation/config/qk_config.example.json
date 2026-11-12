@@ -1,0 +1,7 @@
+﻿{
+  "default_source": "source_a",
+  "sources": {
+    "source_a": {"threshold": 0.5},
+    "source_b": {"threshold": 0.5}
+  }
+}

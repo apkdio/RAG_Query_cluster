@@ -1,4 +1,4 @@
-"""命令行入口：python -m query_core <cluster|review|qk>。"""
+"""命令行入口：python -m query_cluster <cluster|review|qk>。"""
 
 from __future__ import annotations
 
@@ -7,11 +7,13 @@ import json
 from pathlib import Path
 
 from .canvas import build_canvas
+from .llm import LLMError, client_from_env
+from .llm_review import DEFAULT_INSTRUCTIONS, LLMReviewError, review as llm_review, save_outputs
 from .manual import load_rules
 from .pipeline import build_clusters, load_input, write_result
 from .qk import match
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -35,6 +37,17 @@ def main(argv: list[str] | None = None) -> int:
     p_qk.add_argument("--backend", choices=["auto", "ollama", "hash"], default="auto")
     p_qk.add_argument("--json", action="store_true")
 
+    p_llm = sub.add_parser("llm-review", help="LLM 初审并应用 patch")
+    p_llm.add_argument("--clusters", required=True, help="输入 clusters.json")
+    p_llm.add_argument("--out", required=True, help="输出目录")
+    p_llm.add_argument("--instructions", default=DEFAULT_INSTRUCTIONS)
+    p_llm.add_argument("--instructions-file", default=None)
+    p_llm.add_argument("--base-url", default=None, help="OpenAI 兼容接口，默认 LLM_BASE_URL")
+    p_llm.add_argument("--model", default=None, help="模型名，默认 LLM_MODEL")
+    p_llm.add_argument("--api-key-env", default="LLM_API_KEY")
+    p_llm.add_argument("--timeout", type=int, default=90)
+    p_llm.add_argument("--max-attempts", type=int, default=3)
+
     args = parser.parse_args(argv)
 
     if args.cmd == "cluster":
@@ -54,6 +67,36 @@ def main(argv: list[str] | None = None) -> int:
         out_path = Path(args.out)
         path = build_canvas(payload, out_path, key=out_path.parent.name)
         print(f"复核页：{path}")
+        return 0
+
+    if args.cmd == "llm-review":
+        original = json.loads(Path(args.clusters).read_text(encoding="utf-8"))
+        clusters = original.get("clusters") or []
+        instructions = args.instructions
+        if args.instructions_file:
+            instructions = Path(args.instructions_file).read_text(encoding="utf-8")
+        out_dir = Path(args.out)
+        try:
+            client = client_from_env(args.base_url, args.model, args.api_key_env, args.timeout)
+            new_clusters, removed, log, patch = llm_review(clusters, instructions,
+                                                           client.chat, args.max_attempts)
+        except (LLMError, LLMReviewError) as exc:
+            out_dir.mkdir(parents=True, exist_ok=True)
+            attempts = getattr(exc, "attempts", [])
+            (out_dir / "llm_failure.json").write_text(
+                json.dumps({"error": str(exc), "attempts": attempts}, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            print(f"LLM 初审失败：{exc}")
+            print(f"失败记录：{out_dir / 'llm_failure.json'}")
+            return 1
+        result = save_outputs(original, new_clusters, removed, log, out_dir,
+                              title=f"LLM 初审 · {out_dir.name}")
+        print(f"{len(clusters)} 个簇 -> {len(new_clusters)} 个簇；"
+              f"移动 {len(log.get('moves', []))} / 改名 {len(log.get('renames', []))} / 移除 {len(log.get('removed', []))}")
+        print(f"结果：{out_dir / 'clusters.json'}")
+        print(f"复核页：{out_dir / 'review.html'}")
+        print(f"变更视图：{out_dir / 'diff.html'}")
         return 0
 
     result = match(args.query, Path(args.table), backend=args.backend)

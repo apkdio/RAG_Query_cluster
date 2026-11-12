@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from query_core.canvas import build_canvas
-from query_core.cluster import cluster_terms
-from query_core.pipeline import build_clusters, parse_terms
-from query_core.qk import match
+from query_cluster.canvas import build_canvas
+from query_cluster.cluster import cluster_terms
+from query_cluster.pipeline import build_clusters, parse_terms
+from query_cluster.qk import match
 
 ROOT = Path(__file__).resolve().parents[1]
 

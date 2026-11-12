@@ -1,0 +1,6 @@
+{
+  "threshold": 0.62,
+  "high_similarity_override": 0.75,
+  "lexical_guard": true,
+  "embedding": "auto"
+}

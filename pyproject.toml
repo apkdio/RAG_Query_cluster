@@ -1,10 +1,12 @@
 [project]
-name = "query-core"
+name = "query-cluster-validation"
 version = "0.1.0"
-description = "固定阈值的词汇聚类与 QK 双路匹配"
+description = "Query 聚类复核与 QK 召回验证工作区"
 requires-python = ">=3.10"
 dependencies = []
 
-[tool.pytest.ini_options]
-pythonpath = ["."]
-testpaths = ["tests"]
+[dependency-groups]
+dev = ["pytest"]
+
+[tool.uv.workspace]
+members = ["query_cluster", "qk_validation"]
