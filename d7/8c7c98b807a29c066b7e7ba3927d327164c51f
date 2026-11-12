@@ -1,0 +1,26 @@
+query_cluster/src/query_cluster/entities/state.py
+  s_1250751e5fa60e::t_7045321fd61e54 86
+query_cluster/tests/test_entities.py
+  s_1250751e5fa60e::t_47b8a2487bdb35 17
+  s_1250751e5fa60e::t_b34f6d7f1fb8e4 64,67
+  s_1250751e5fa60e::t_0f498def5683d0 33-34
+  s_1250751e5fa60e::t_edd1058314ef04 65
+query_cluster/src/query_cluster/entities/query.py
+  s_1250751e5fa60e::t_cf166dff8ac833 27,33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "d78c7c98b807a29c066b7e7ba3927d327164c51f",
+  "prompts": {},
+  "sessions": {
+    "s_1250751e5fa60e": {
+      "agent_id": {
+        "tool": "chengxiaobang",
+        "id": "s_bd3qkvb2jhxu",
+        "model": "DeepSeek-V4.1-Flash"
+      },
+      "human_author": "apkdio <apkdio@163.com>"
+    }
+  }
+}
