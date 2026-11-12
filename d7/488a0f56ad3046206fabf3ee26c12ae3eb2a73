@@ -1,0 +1,45 @@
+query_cluster/src/query_cluster/clustering/embed.py
+  s_1250751e5fa60e::t_23a0edac6979c7 30
+query_cluster/src/query_cluster/preprocess/dedupe.py
+  s_1250751e5fa60e::t_bfa5bf950bb159 1-27
+query_cluster/src/query_cluster/clustering/pipeline.py
+  s_1250751e5fa60e::t_6b5cfb71bcf7d8 1-63
+query_cluster/src/query_cluster/preprocess/__init__.py
+  s_1250751e5fa60e::t_603ec4ede71519 1-6
+query_cluster/src/query_cluster/__main__.py
+  s_1250751e5fa60e::t_20904a2ce95ce0 30
+  s_1250751e5fa60e::t_024ee3c2801fab 10
+  s_1250751e5fa60e::t_3344e675cb59d8 57-65
+query_cluster/src/query_cluster/clustering/algorithm.py
+  s_1250751e5fa60e::t_c5f8fa1ce6680a 6
+query_cluster/README.md
+  s_1250751e5fa60e::t_8cb1f618d9a333 36-38
+  s_1250751e5fa60e::t_fd87d20448b182 5,13-17
+query_cluster/src/query_cluster/embed.py
+  s_1250751e5fa60e::t_bb4533c8aef4d1 1,3,5
+README.md
+  s_1250751e5fa60e::t_9aacf4c8c767cc 8
+  s_1250751e5fa60e::t_dc765cfa62c6b0 38-43
+query_cluster/src/query_cluster/cluster.py
+  s_1250751e5fa60e::t_01aa0ac6062862 1,3,5
+query_cluster/tests/test_state_pipeline.py
+  s_1250751e5fa60e::t_07824ea452b087 1-47
+query_cluster/src/query_cluster/normalize.py
+  s_1250751e5fa60e::t_8f9446726c783d 1,3,5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "d7488a0f56ad3046206fabf3ee26c12ae3eb2a73",
+  "prompts": {},
+  "sessions": {
+    "s_1250751e5fa60e": {
+      "agent_id": {
+        "tool": "chengxiaobang",
+        "id": "s_bd3qkvb2jhxu",
+        "model": "DeepSeek-V4.1-Flash"
+      },
+      "human_author": "apkdio <apkdio@163.com>"
+    }
+  }
+}
