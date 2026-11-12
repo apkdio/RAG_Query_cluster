@@ -1,0 +1,74 @@
+query_cluster/src/query_cluster/canvas.py
+  s_1250751e5fa60e::t_8e360c96c80f3d 8
+query_cluster/src/query_cluster/review/export.py
+  s_1250751e5fa60e::t_3067495e7808ab 1-31
+query_cluster/src/query_cluster/review/server.py
+  s_1250751e5fa60e::t_b924cc9479e24b 121-123
+  s_1250751e5fa60e::t_8d40c5d66e7167 146-151,157,164
+  s_1250751e5fa60e::t_4768233c347438 111
+  s_1250751e5fa60e::t_0cb31973773e78 26-83
+  s_1250751e5fa60e::t_cd7d8df7a46d6e 1-25,84-110,112-120,124-145,152-156,158-163,165-193
+README.md
+  s_1250751e5fa60e::t_b5d9ee49157afe 43-50
+  s_1250751e5fa60e::t_a565017b492740 8
+query_cluster/src/query_cluster/review/actions.py
+  s_1250751e5fa60e::t_8f2e84672be1f7 58,69,73,77
+  s_1250751e5fa60e::t_642b9093fe5193 23,25-27,29-30,33
+  s_1250751e5fa60e::t_f9df6e7bf9c6ed 107-109
+  s_1250751e5fa60e::t_34f2c2e86a1705 1-22,24,28,31-32,34-57,59-68,70-72,74-76,78-106,110-115
+query_cluster/src/query_cluster/clustering/pipeline.py
+  s_1250751e5fa60e::t_508e46078c8529 61
+  s_1250751e5fa60e::t_d88d02b65ff371 62-72
+  s_1250751e5fa60e::t_0854b9f3de3aa9 6
+query_cluster/src/query_cluster/__main__.py
+  s_1250751e5fa60e::t_020068a7e71388 23
+  s_1250751e5fa60e::t_e6864da51dd045 44-48
+  s_1250751e5fa60e::t_3515e8d4c5101d 96-98
+query_cluster/README.md
+  s_1250751e5fa60e::t_e67dfeab104aa8 5
+  s_1250751e5fa60e::t_390c3299296838 21-23
+query_cluster/tests/test_review.py
+  s_1250751e5fa60e::t_d1611a06835e57 65-94
+  s_1250751e5fa60e::t_887e006ce4f811 122-124
+  s_1250751e5fa60e::t_1114ace93fa6a1 1-64,95-96,98-121,135-138
+  s_1250751e5fa60e::t_fca767f31b1770 125-134
+  s_1250751e5fa60e::t_117d73fb5f0f4d 97
+query_cluster/templates/review.html
+  s_1250751e5fa60e::t_4fd7f41f1e8cd2 5-6,8-12,14-44,47-78,83-88,90,95-98,100-116,118-120,124,126,128-131,134-139,142-146,159,161,163-166,170,172-176,178-185,202-220,222-230,232-235,237,250,254-258,260-265,271,285-300,303-315,317-327,329-332,335-342,345-347,384-387,390-393,395-396,398-399,433-434,437-446,448,451-457,460-461
+  s_1250751e5fa60e::t_37ae867b76d425 402-408,412-414
+  s_1250751e5fa60e::t_3f02ea0fca3aef 449
+  s_1250751e5fa60e::t_bd4a171824c3de 91-93
+  s_1250751e5fa60e::t_9c648addad24fd 122
+  s_1250751e5fa60e::t_fa3ae70207fa45 149,151-156,162
+  s_1250751e5fa60e::t_dda3f56d7b45a1 450
+  s_1250751e5fa60e::t_5e87ccd5010ed1 275-280,282
+  s_1250751e5fa60e::t_f89d45d633f089 266-270
+  s_1250751e5fa60e::t_ba80b8b0c69eee 177,186,189,191-195,197-198
+  s_1250751e5fa60e::t_d6b0fea7baf313 238-243,245
+  s_1250751e5fa60e::t_8731f6d909c8d6 375
+  s_1250751e5fa60e::t_917c640681d9b3 251
+  s_1250751e5fa60e::t_aaaab4fec14701 45-46
+  s_1250751e5fa60e::t_209f3b28a691ac 94
+  s_1250751e5fa60e::t_d66d3e83c75f0a 123
+  s_1250751e5fa60e::t_c88a6d1c9a690a 417-429,432
+  s_1250751e5fa60e::t_b8aa68a1778158 350-353,355-368,370-374,376-380,383
+  s_1250751e5fa60e::t_eb15b11a6ff994 369
+query_cluster/src/query_cluster/review/__init__.py
+  s_1250751e5fa60e::t_388b0385ad47ff 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "29baca0c0b9cbf22a950c160266b1135eacfee1a",
+  "prompts": {},
+  "sessions": {
+    "s_1250751e5fa60e": {
+      "agent_id": {
+        "tool": "chengxiaobang",
+        "id": "s_bd3qkvb2jhxu",
+        "model": "DeepSeek-V4.1-Flash"
+      },
+      "human_author": "apkdio <apkdio@163.com>"
+    }
+  }
+}
