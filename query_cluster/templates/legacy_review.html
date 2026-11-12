@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>簇复核 · 未加载</title>
+<style>
+
+  :root {
+    --ink:#0f172a; --ink-sub:#475569; --line:#cbd5e1; --bg:#f1f5f9; --accent:#2563eb;
+    --shadow-sm:0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
+    --shadow-md:0 8px 24px -4px rgba(15,23,42,.08), 0 2px 6px -1px rgba(15,23,42,.04);
+    --shadow-lg:0 14px 32px -6px rgba(15,23,42,.12), 0 4px 10px -2px rgba(15,23,42,.06);
+  }
+  * { box-sizing: border-box; }
+  html, body { height:100%; }
+  body { margin:0; font:14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+         color:var(--ink); background:var(--bg); display:flex; flex-direction:column; overflow:hidden;
+         -webkit-font-smoothing:antialiased; }
+  ::-webkit-scrollbar { width:8px; height:8px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:999px; }
+  ::-webkit-scrollbar-thumb:hover { background:#94a3b8; }
+  header { position:relative; z-index:10; flex:none; background:#fff;
+           border-bottom:1px solid #e2e8f0; box-shadow:0 1px 3px rgba(15,23,42,.03); padding:10px 20px;
+           display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  header h1 { font-size:15px; font-weight:700; color:#0f172a; margin:0 6px 0 0; letter-spacing:.01em; }
+  header .stat { color:#64748b; font-size:12.5px; background:#f8fafc; border:1px solid #e2e8f0;
+                 padding:3px 10px; border-radius:999px; margin-right:6px; }
+  header button { border:1px solid #cbd5e1; background:#fff; color:#334155; font-size:13px; font-weight:500;
+                  border-radius:7px; padding:5px 11px; cursor:pointer; transition:background .15s, border-color .15s, color .15s, box-shadow .15s;
+                  box-shadow:0 1px 2px rgba(15,23,42,.03); }
+  header button:hover { background:#f8fafc; border-color:#94a3b8; color:#0f172a; }
+  header button.primary { background:linear-gradient(180deg, #3b82f6 0%, #2563eb 100%); color:#fff;
+                          border-color:#1d4ed8; box-shadow:0 1px 3px rgba(37,99,235,.25); }
+  header button.primary:hover { background:linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%); color:#fff; }
+  #reset:hover { color:#dc2626; border-color:#fca5a5; background:#fef2f2; }
+  header label { font-size:13px; color:#475569; display:inline-flex; align-items:center; gap:5px;
+                 padding:4px 10px; border-radius:7px; cursor:pointer; user-select:none; transition:background .15s; }
+  header label:hover { background:#f1f5f9; }
+  header label input[type="checkbox"] { accent-color:var(--accent); cursor:pointer; }
+  #stage { flex:1; overflow:auto; position:relative; background-color:#f8fafc; cursor:grab; }
+  #stage.pan-mode, #stage.panning { cursor:grabbing; }
+  #stage.panning #board { pointer-events:none; }
+  .cluster { cursor:default; }
+  #empty-hint { position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+                color:#64748b; font-size:15px; text-align:center; padding:40px; pointer-events:none; z-index:5; }
+  #canvas { position:relative; min-width:100%; min-height:100%;
+            background-image:radial-gradient(#cbd5e1 1.15px, transparent 1.15px); background-size:22px 22px; }
+  main { padding:0; }
+  #board { position:relative; margin:24px; transform-origin:0 0; }
+  .cluster { position:absolute; display:flex; align-items:center; gap:0; z-index:1; }
+  .cluster:hover { z-index:30; }
+  .cluster.dragging { z-index:45; will-change:transform; }
+  .cluster.dragging .oval { cursor:grabbing; box-shadow:0 20px 38px -8px rgba(15,23,42,.18), 0 6px 14px -3px rgba(15,23,42,.08); }
+  .cluster.merge-target .oval { outline:3px dashed var(--accent); outline-offset:4px; }
+  .oval .head { cursor:move; user-select:none; }
+  #trash { position:fixed; right:20px; bottom:42px; width:350px; max-height:42vh; background:#fff;
+           border:1.5px dashed #f59e0b; border-radius:12px; padding:10px 12px;
+           display:none; flex-direction:column; gap:8px; z-index:40; box-shadow:var(--shadow-lg);
+           transition:border-color .15s, background .15s; }
+  #trash .thead { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:#92400e; }
+  #trash .cnt { background:#f59e0b; color:#fff; border-radius:999px; padding:1px 8px; font-size:11.5px; font-weight:700; }
+  #trash .thead button { margin-left:auto; border:1px solid #e2e8f0; background:#f8fafc; color:#475569;
+                         border-radius:6px; padding:2px 8px; font-size:12px; cursor:pointer; }
+  #trash .thead button:hover { background:#e2e8f0; }
+  #trash-list { display:flex; flex-wrap:wrap; gap:6px; overflow:auto; padding:2px 0; }
+  #trash-list .trash-item { display:flex; align-items:center; gap:3px; }
+  #trash-list .chip { background:#fffbeb; border-color:#fbbf24; color:#92400e; }
+  #trash-list .trash-item button { border:1px solid #cbd5e1; background:#fff; border-radius:5px;
+                                   cursor:pointer; padding:1px 5px; color:#64748b; }
+  #trash-list .trash-item button:hover { color:#0f172a; border-color:#94a3b8; }
+  #trash.zone-hot { border-color:#dc2626; background:#fef2f2; }
+  .trash-tip { color:#94a3b8; font-size:12px; padding:4px 2px; }
+  .chip { user-select:none; }
+  #help-modal { position:fixed; inset:0; background:rgba(15,23,42,.45); backdrop-filter:blur(3px);
+                display:none; align-items:center; justify-content:center; z-index:75; }
+  #help-modal.show { display:flex; }
+  .help-box { background:#fff; border-radius:14px; width:min(680px, 92vw); max-height:80vh; display:flex;
+              flex-direction:column; padding:20px 24px; gap:12px; box-shadow:var(--shadow-lg); border:1px solid #e2e8f0; }
+  .help-box h3 { margin:0; font-size:16px; color:#0f172a; }
+  .help-body { overflow:auto; font-size:13.5px; line-height:1.75; color:#334155; }
+  .help-body p { margin:0 0 9px; }
+  .help-body b { color:#0f172a; }
+  .help-actions { display:flex; justify-content:flex-end; padding-top:4px; }
+  .help-actions button { border:1px solid #0f172a; background:#0f172a; color:#fff; border-radius:7px;
+                         padding:6px 16px; font-size:13px; cursor:pointer; }
+  #dup-modal { position:fixed; inset:0; background:rgba(15,23,42,.45); backdrop-filter:blur(3px);
+               display:none; align-items:center; justify-content:center; z-index:70; }
+  #dup-modal.show { display:flex; }
+  .dup-box { background:#fff; border-radius:14px; width:min(720px, 90vw); max-height:80vh; display:flex;
+             flex-direction:column; padding:20px 24px; gap:12px; box-shadow:var(--shadow-lg); border:1px solid #e2e8f0; }
+  .dup-box h3 { margin:0; font-size:15px; color:#0f172a; }
+  .dup-list { overflow:auto; display:flex; flex-direction:column; gap:10px; }
+  .dup-item { border:1px solid #e2e8f0; background:#f8fafc; border-radius:8px; padding:10px 12px; }
+  .dup-text { font-weight:600; margin-bottom:6px; color:#0f172a; }
+  .dup-loc { display:flex; flex-wrap:wrap; gap:6px; }
+  .dup-loc button { border:1px solid #cbd5e1; background:#fff; border-radius:6px; padding:2px 10px;
+                    cursor:pointer; font-size:12px; color:#334155; }
+  .dup-loc button:hover { border-color:var(--accent); color:var(--accent); }
+  .dup-actions { display:flex; justify-content:flex-end; padding-top:4px; }
+  .dup-actions button { border:1px solid #0f172a; background:#0f172a; color:#fff; border-radius:7px;
+                        padding:6px 14px; font-size:13px; cursor:pointer; }
+  .cluster.flash { outline:3px solid #f59e0b; outline-offset:8px; border-radius:24px; }
+  #toast { position:fixed; left:50%; bottom:52px; transform:translateX(-50%); background:rgba(15,23,42,.92);
+           backdrop-filter:blur(4px); color:#fff; padding:8px 16px; border-radius:999px; font-size:13px;
+           box-shadow:var(--shadow-md); opacity:0; pointer-events:none; transition:opacity .18s; z-index:60; }
+  #toast.show { opacity:1; }
+  .metablock { border:1px solid #e2e8f0; border-radius:10px; padding:9px 11px; background:#fff;
+               min-width:260px; box-shadow:var(--shadow-sm); }
+  .metablock .mhead { display:flex; align-items:center; justify-content:space-between; font-size:11.5px;
+                      font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#64748b; margin-bottom:4px; }
+  .metablock .mhead button, .meta-row button { border:1px solid #e2e8f0; background:#f8fafc; color:#475569;
+                                               border-radius:5px; padding:0 7px; cursor:pointer; line-height:20px; }
+  .metablock .mhead button:hover, .meta-row button:hover { background:#e2e8f0; color:#0f172a; }
+  .meta-row { display:flex; gap:6px; margin-top:6px; }
+  .meta-row input { border:1px solid #cbd5e1; border-radius:6px; padding:4px 8px; font-size:12px;
+                    font-family:inherit; color:#1e293b; background:#f8fafc;
+                    transition:border-color .15s, background .15s, box-shadow .15s; }
+  .meta-row input:focus { outline:none; background:#fff; border-color:var(--accent);
+                          box-shadow:0 0 0 2px rgba(37,99,235,.14); }
+  .meta-row input.slug { width:88px; }
+  .meta-row input.kw { flex:1; min-width:116px; }
+  .stale { font-size:12px; color:#b45309; background:#fef3c7; border:1px solid #fcd34d;
+            border-radius:5px; padding:0 6px; margin-left:6px; }
+  .head .del { margin-left:auto; border:1px solid #fee2e2; color:#ef4444; background:#fff5f5; border-radius:6px;
+               padding:0 7px; cursor:pointer; line-height:20px; font-weight:600; transition:all .15s; }
+  .head .del:hover { background:#ef4444; color:#fff; border-color:#ef4444; }
+  svg.wires { position:absolute; inset:0; pointer-events:none; z-index:0; overflow:visible; }
+  svg.wires path { stroke:#94a3b8; stroke-dasharray:4 3; }
+  .oval-wrap, .side { position:relative; z-index:1; }
+  .oval-wrap:hover, .side:hover { z-index:20; }
+  .oval-wrap { position:relative; flex:0 0 auto; }
+  .oval { position:relative; border:1.5px solid #cbd5e1; border-radius:32px; padding:24px 30px 28px;
+          min-width:380px; max-width:560px; background:#fff; box-shadow:var(--shadow-md);
+          transition:border-color .18s ease, box-shadow .18s ease, background .18s ease; }
+  .oval:hover { border-color:#94a3b8; box-shadow:var(--shadow-lg); }
+  .oval .head { display:flex; align-items:center; gap:8px; justify-content:center; margin-bottom:10px; }
+  .oval .cid { font-weight:700; font-size:13.5px; color:#0f172a; background:#f1f5f9;
+               padding:2px 9px; border-radius:999px; border:1px solid #e2e8f0; }
+  .oval .meta { color:#64748b; font-size:12px; }
+  .oval .labelbar { display:flex; gap:6px; justify-content:center; margin-bottom:12px; flex-wrap:wrap; }
+  .oval .labelbar button { font-size:12px; font-weight:500; padding:3px 10px; border:1px solid #cbd5e1;
+                           background:#f8fafc; color:#475569; border-radius:999px; cursor:pointer; transition:all .15s ease; }
+  .oval .labelbar button:hover { border-color:#94a3b8; background:#fff; color:#0f172a; }
+  .oval .labelbar button.on { background:#0f172a; color:#fff; border-color:#0f172a; box-shadow:0 1px 3px rgba(15,23,42,.2); }
+  .oval .labelbar button[data-label="0"].on { background:#16a34a; border-color:#15803d; box-shadow:0 2px 5px rgba(22,163,74,.25); }
+  .oval .labelbar button[data-label="1"].on { background:#dc2626; border-color:#b91c1c; box-shadow:0 2px 5px rgba(220,38,38,.25); }
+  .oval .labelbar button[data-label="2"].on { background:#d97706; border-color:#b45309; box-shadow:0 2px 5px rgba(217,119,6,.25); }
+  .oval .labelbar button[data-label="4"].on { background:#0d9488; border-color:#0f766e; box-shadow:0 2px 5px rgba(13,148,136,.25); }
+  .labelbar .noaction { font-size:12px; border:1px dashed #94a3b8; background:transparent; color:#64748b;
+                        border-radius:999px; padding:3px 10px; cursor:pointer; }
+  .labelbar .noaction.on { background:#475569; color:#fff; border-color:#475569; border-style:solid; }
+  .oval:has(.labelbar button[data-label="0"].on) { border-color:#22c55e; background:linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+                                                    box-shadow:0 8px 24px -4px rgba(22,163,74,.14), 0 0 0 1px rgba(34,197,94,.2); }
+  .oval:has(.labelbar button[data-label="1"].on) { border-color:#ef4444; background:linear-gradient(180deg, #ffffff 0%, #fef2f2 100%);
+                                                    box-shadow:0 8px 24px -4px rgba(220,38,38,.14), 0 0 0 1px rgba(239,68,68,.2); }
+  .oval:has(.labelbar button[data-label="2"].on) { border-color:#f59e0b; background:linear-gradient(180deg, #ffffff 0%, #fffbeb 100%);
+                                                    box-shadow:0 8px 24px -4px rgba(217,119,6,.14), 0 0 0 1px rgba(245,158,11,.2); }
+  .oval:has(.labelbar button[data-label="4"].on) { border-color:#14b8a6; background:linear-gradient(180deg, #ffffff 0%, #f0fdfa 100%);
+                                                    box-shadow:0 8px 24px -4px rgba(13,148,136,.14), 0 0 0 1px rgba(20,184,166,.2); }
+  .chips { display:flex; flex-wrap:wrap; gap:7px; justify-content:center; max-width:440px; margin:0 auto; }
+  .chip { position:relative; border:1px solid #cbd5e1; background:#fff; color:#1e293b; padding:4px 10px; border-radius:7px; cursor:grab;
+          font-size:13px; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+          box-shadow:0 1px 2px rgba(15,23,42,.04); transition:border-color .15s ease; }
+  @keyframes chipPop {
+    from { opacity:0; transform:translateY(1px) scale(.96); }
+    to { opacity:1; transform:translateY(-1px) scale(1); }
+  }
+  .chip:not(.ghost):hover { overflow:visible; color:transparent; border-color:transparent; background:transparent; box-shadow:none; }
+  .chip:not(.ghost):hover::after {
+    content:attr(data-tip); position:absolute; left:-1px; top:-1px; min-width:calc(100% + 2px); width:max-content; max-width:380px;
+    padding:4px 11px; border-radius:7px; border:1px solid #64748b; background:#fff; color:#0f172a;
+    white-space:normal; word-break:break-word; line-height:1.45; box-shadow:0 8px 22px rgba(15,23,42,.16);
+    pointer-events:none; z-index:40; transform-origin:left center;
+    animation:chipPop .16s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  .chip:active { cursor:grabbing; }
+  .chip.out { border-color:#f59e0b; background:#fffbeb; color:#92400e; }
+  .chip.out:not(.ghost):hover::after { border-color:#d97706; background:#fffbeb; color:#92400e; }
+  .chip.moved { border-color:#8b5cf6; background:#f5f3ff; color:#5b21b6; }
+  .chip.moved:not(.ghost):hover::after { border-color:#7c3aed; background:#f5f3ff; color:#5b21b6; }
+  .chip.ghost { border:1px dashed #cbd5e1; background:#f8fafc; color:#94a3b8; cursor:default;
+                text-decoration:line-through; box-shadow:none; }
+  .chip.in { border-color:#38bdf8; background:#f0f9ff; color:#075985; }
+  .chip.in:not(.ghost):hover::after { border-color:#0284c7; background:#f0f9ff; color:#075985; }
+  .side { display:flex; flex-direction:column; gap:12px; margin-left:52px; }
+  .box { border:1.5px solid #cbd5e1; border-radius:10px; padding:9px 11px; min-width:240px; background:#fff;
+         box-shadow:var(--shadow-sm); transition:border-color .15s, box-shadow .15s, background .15s; }
+  .box h4 { margin:-9px -11px 8px -11px; padding:6px 11px; font-size:12px; font-weight:600;
+            letter-spacing:.02em; border-radius:8.5px 8.5px 0 0; border-bottom:1px solid transparent; }
+  .box[data-zone="out"] { border-color:#fbbf24; }
+  .box[data-zone="out"] h4 { background:#fffbeb; color:#b45309; border-bottom-color:#fef3c7; }
+  .box[data-zone="in"], .box[data-zone="inn"] { border-color:#7dd3fc; }
+  .box[data-zone="in"] h4, .box[data-zone="inn"] h4 { background:#f0f9ff; color:#0369a1; border-bottom-color:#e0f2fe; }
+  .box .chips { justify-content:flex-start; min-height:28px; }
+  .box:empty { min-height:52px; }
+  .zone-hot { outline:2.5px dashed var(--accent); outline-offset:3px; background:#eff6ff !important; }
+  .empty { color:#94a3b8; font-size:12px; }
+  footer { flex:none; padding:7px 20px; background:#fff; border-top:1px solid #e2e8f0; color:#64748b; font-size:12px; z-index:10; }
+  .zoom { margin-left:auto; display:flex; align-items:center; gap:5px; background:#f8fafc;
+          padding:3px 6px; border-radius:8px; border:1px solid #e2e8f0; }
+  .help-btn { display:inline-flex; align-items:center; gap:5px; border:1px solid #e2e8f0; background:#f8fafc;
+              font-weight:600; letter-spacing:.04em; color:#0f172a; padding:5px 10px; border-radius:7px; cursor:pointer; }
+  .help-icon { width:17px; height:17px; border:1.8px solid currentColor; border-radius:50%;
+               display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
+  .zoom button { min-width:28px; padding:3px 8px; border-radius:5px; }
+  #zoom-val { min-width:44px; text-align:center; font-variant-numeric:tabular-nums; color:#334155; font-weight:600; font-size:12.5px; }
+
+  /* 删除态（保留原规则） */
+  .cluster.deleted { opacity:.56; filter:grayscale(1); transition:opacity .2s ease, filter .2s ease; }
+  .cluster.deleted:hover { opacity:.82; }
+  .cluster.deleted .oval { border:2px dashed #94a3b8; background:#f1f5f9; box-shadow:none; }
+  .cluster.deleted .cid { background:#e2e8f0; color:#64748b; border-color:#cbd5e1; text-decoration:line-through; }
+  .cluster.deleted .del-badge { font-size:12px; font-weight:600; color:#64748b; background:#e2e8f0; border:1px solid #cbd5e1; }
+  .cluster.deleted .box, .cluster.deleted .metablock { border:1.5px dashed #cbd5e1; background:#f1f5f9; box-shadow:none; }
+  .cluster.deleted .box h4 { background:#e2e8f0; color:#64748b; border-bottom-color:#cbd5e1; }
+  .cluster.deleted .meta-row input, .cluster.deleted button { background:#e2e8f0; color:#94a3b8; border-color:#cbd5e1; pointer-events:none; }
+  .cluster.merge-target .oval { outline:3px dashed #2563eb; outline-offset:6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>簇复核 · 未加载</h1>
+  <span class="stat" id="stat"></span>
+  <button id="export-csv" class="primary">导出 CSV</button>
+  <button id="export-json">导出 JSON</button>
+  <button id="dup-check">查重</button>
+  <button id="load-file">加载结果文件</button>
+  <input type="file" id="file-input" accept=".json,.jsonl" hidden>
+  <button id="new-cluster">新建簇</button>
+  <button id="relayout">重新排布</button>
+  <button id="reset">清空本地标注</button>
+  <label><input type="checkbox" id="only-unlabeled"> 只看未标注</label>
+  <span class="zoom">
+    <button id="zoom-out" title="缩小 (Ctrl+-)">−</button>
+    <span id="zoom-val">100%</span>
+    <button id="zoom-in" title="放大 (Ctrl+=)">＋</button>
+    <button id="zoom-fit" title="适应宽度">适应宽度</button>
+    <button id="zoom-reset" title="100% (Ctrl+0)">重置</button>
+  </span>
+  <button id="help-btn" class="help-btn" title="标注规则">
+    <span class="help-icon">?</span>HELP
+  </button>
+</header>
+<div id="stage">
+  <div id="empty-hint">还没有数据 —— 点「加载结果文件」，或把 clusters.json 直接拖进画布</div>
+  <div id="canvas"><main id="board"></main></div>
+</div>
+<div id="trash" data-zone="trash">
+  <div class="thead"><span>🗑 不可获取 / 无法归簇</span><span class="cnt" id="trash-count">0</span>
+    <button id="trash-toggle" type="button">收起</button></div>
+  <div id="trash-list"></div>
+</div>
+<div id="help-modal">
+  <div class="help-box">
+    <h3>标注规则</h3>
+    <div class="help-body">
+      <p><b>标签（每个簇必选）</b>：正确 = 原始 core 未变；部分 = core 被移走过成员；不正确 = 整簇错误；新建 = 人工建的簇。</p>
+      <p><b>不作处理</b>：独立开关，只表示这批暂不治理，不替代质量标签。</p>
+      <p><b>core 只出不进</b>：新增 query 只能拖到目标簇的 suspect IN；最终聚类结果 = core + IN。</p>
+      <p><b>suspect OUT</b>：必须清零，接受就拖进 core/IN，不接受就拖到别的簇 IN 或垃圾桶。</p>
+      <p><b>删除簇</b>：等于判定整簇错误，原始 core 会记入导出（label=1, deleted=true）。</p>
+      <p><b>灰色划线块</b>：原成员被移出后留在原簇的占位，移回或 Ctrl+Z 后消失，不参与统计。</p>
+      <p><b>编号</b>：C1:Q1 = 原簇 1 的第 1 条；拖动不变，便于追踪来源。</p>
+      <p><b>快捷键</b>：Ctrl+Z 撤销，Ctrl+Shift+Z 重做；Ctrl+拖动空白平移；Ctrl+滚轮缩放；双击 query 复制文本。</p>
+      <p><b>导出</b>：CSV/JSON 含 label、core、suspect_in、final_members、slug_keywords、no_action 等字段。</p>
+    </div>
+    <div class="help-actions"><button id="help-close" type="button">知道了</button></div>
+  </div>
+</div>
+<div id="dup-modal">
+  <div class="dup-box">
+    <h3>重复 query <span id="dup-count"></span></h3>
+    <div class="trash-tip">每行是一条 query，下面列出它出现的簇；不同行之间没有比较关系</div>
+    <div class="dup-list" id="dup-list"></div>
+    <div class="dup-actions"><button id="dup-close" type="button">关闭</button></div>
+  </div>
+</div>
+<div id="toast"></div>
+<footer>拖拽 query 可在簇之间移动；拖到右侧橙色框表示“不属于”，拖到蓝色框再拖回椭圆表示“接受合并建议”。标注会存在浏览器本地；Ctrl+Z 撤销，Ctrl+Shift+Z 重做。</footer>
+<script>
+let DATA = __DATA__;
+const PAGE_KEY = DATA.key || "viewer";
+let STORE_KEY = "cluster-review:" + DATA.key;
+let FID_MAP = {};
+
+function refreshFidMap() {
+  FID_MAP = {};
+  (DATA.clusters || []).forEach(c => {
+    let q = 0;
+    [["core", "c"], ["out", "o"], ["in", "i"]].forEach(([zone, mark]) => {
+      (c[zone] || []).forEach((_, i) => {
+        q += 1;
+        FID_MAP[c.id + ":" + mark + i] = dispCid(c.id) + ":Q" + q;
+      });
+    });
+  });
+}
+
+refreshFidMap();
+let state = load() || buildInitial();
+let zoom = state.zoom || 1;
+let layout = state.layout || null;
+const LAYOUT_VER = 2;
+
+function dispCid(cid) {
+  return /^N/.test(cid) ? "N" + parseInt(cid.slice(1), 10) : "C" + parseInt(cid, 10);
+}
+
+function contentHash(data) {
+  const text = (data.clusters || []).map(c => (c.core || []).join("|")).join("#");
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) { h ^= text.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0).toString(16).padStart(8, "0");
+}
+
+function dataSig(data) {
+  const parts = [];
+  (data.clusters || []).forEach(c => {
+    parts.push(c.id + "|" + (c.core || []).join("~") + "|" + (c.out || []).join("~") + "|" + (c.in || []).join("~"));
+  });
+  let h = 2166136261;
+  const text = parts.join("#");
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(16) + ":" + parts.length;
+}
+
+function buildInitial() {
+  const s = { chips: {}, clusters: {}, order: [], seq: 0, trash: [], fids: {}, fitted: false, dataSig: dataSig(DATA) };
+  DATA.clusters.forEach(c => {
+    const core = c.core.map((text, i) => {
+      const id = c.id + ":c" + i;
+      s.chips[id] = text;
+      return id;
+    });
+    const out = c.out.map((text, i) => {
+      const id = c.id + ":o" + i;
+      s.chips[id] = text;
+      return id;
+    });
+    const inn = c.in.map((text, i) => {
+      const id = c.id + ":i" + i;
+      s.chips[id] = text;
+      return id;
+    });
+    s.clusters[c.id] = { label: /^N/.test(c.id) ? "4" : "", no_action: false, core, out, inn, meta: c.meta, kws: [{ slug: "", keywords: "" }],
+                        orig: { core: [...core], out: [...out], users: c.users, cohesion: c.cohesion } };
+    s.order.push(c.id);
+  });
+  return s;
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+function save() { state.layout = layout; state.zoom = zoom; localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+
+let history = [], future = [], lastKey = "", lastTime = 0;
+
+function snapshot() { return JSON.stringify({ state: state, layout: layout, zoom: zoom }); }
+
+function pushHistory(key) {
+  const now = Date.now();
+  if (key && key === lastKey && now - lastTime < 800) { lastTime = now; return; }
+  lastKey = key || ""; lastTime = now;
+  history.push(snapshot());
+  if (history.length > 100) history.shift();
+  future = [];
+}
+
+function restoreSnapshot(json) {
+  const snap = JSON.parse(json);
+  state = snap.state;
+  layout = snap.layout;
+  zoom = snap.zoom || 1;
+  save();
+  applyZoom(zoom, false);
+  render();
+}
+
+function undo() {
+  if (!history.length) { toast("没有可撤销的操作"); return; }
+  future.push(snapshot());
+  restoreSnapshot(history.pop());
+  toast("已撤销（Ctrl+Shift+Z 重做）");
+}
+
+function redo() {
+  if (!future.length) { toast("没有可重做的操作"); return; }
+  history.push(snapshot());
+  restoreSnapshot(future.pop());
+  toast("已重做");
+}
+
+function resizeCanvas() {
+  const board = document.getElementById("board");
+  const canvas = document.getElementById("canvas");
+  const bw = parseFloat(board.style.width) || board.offsetWidth || 0;
+  const bh = parseFloat(board.style.height) || board.offsetHeight || 0;
+  canvas.style.width = (bw * zoom + 40) + "px";
+  canvas.style.height = (bh * zoom + 40) + "px";
+}
+
+function applyZoom(next, keepScroll = true) {
+  const stage = document.getElementById("stage");
+  const board = document.getElementById("board");
+  const old = zoom;
+  zoom = Math.min(2.5, Math.max(0.1, Math.round(next * 100) / 100));
+  const cx = stage.clientWidth / 2, cy = stage.clientHeight / 2;
+  const wx = stage.scrollLeft + cx, wy = stage.scrollTop + cy;
+  const ratio = zoom / old;
+  board.style.transform = "scale(" + zoom + ")";
+  resizeCanvas();
+  requestAnimationFrame(() => {
+    if (keepScroll && old !== zoom) {
+      stage.scrollLeft = wx * ratio - cx;
+      stage.scrollTop = wy * ratio - cy;
+    }
+    drawWires();
+  });
+  document.getElementById("zoom-val").textContent = Math.round(zoom * 100) + "%";
+  save();
+}
+
+function cleanText(raw) {
+  const parts = String(raw == null ? "" : raw).split("|").map(x => x.trim()).filter(Boolean);
+  const uniq = [...new Set(parts)];
+  return uniq.length ? uniq.join(" | ") : "";
+}
+
+function fromClustersJson(obj, key) {
+  const list = Array.isArray(obj) ? obj : (obj && obj.clusters) || [];
+  const items = [];
+  list.forEach((c, i) => {
+    const raw = c.queries || c.terms || [];
+    const members = raw.map(q => cleanText(typeof q === "string" ? q : (q.raw ? q.raw[0] : (q.q || q.text)))).filter(Boolean);
+    if (!members.length) return;
+    items.push({
+      id: String(i + 1).padStart(4, "0"),
+      meta: `${members.length} 条 / 内聚 ${c.cohesion ?? "—"}`,
+      core: members,
+      calls: (c.queries || c.terms || []).map(q => q.calls || q.count || 1),
+      users: c.users,
+      cohesion: c.cohesion,
+      out: (c.suspect_out || []).map(cleanText).filter(Boolean),
+      in: (c.suspect_in || []).map(x => cleanText(typeof x === "string" ? x : x.q)).filter(Boolean)
+    });
+  });
+  return { key: key, clusters: items, source: (obj && obj.source) || "",
+           stats: (obj && obj.stats) || {} };
+}
+
+function keyFor(parsed, file) {
+  const src = (!Array.isArray(parsed) && parsed && parsed.source) ? String(parsed.source) : "";
+  const m = src.match(/[0-9]{4}-[0-9]{2}-[0-9]{2}/);
+  if (m) return m[0];
+  let base = src.split("/").pop() || "";
+  const baseDot = base.lastIndexOf(".");
+  if (baseDot > 0) base = base.slice(0, baseDot);
+  if (base) return base;
+  const name = file.name;
+  const nameDot = name.lastIndexOf(".");
+  return nameDot > 0 ? name.slice(0, nameDot) : name;
+}
+
+function persistPayload(next) {
+  try {
+    localStorage.setItem("cluster-review-payload:" + next.key, JSON.stringify(next));
+    localStorage.setItem("cluster-review-last:" + PAGE_KEY, next.key);
+  } catch (e) {}
+}
+
+function adoptData(next, fileName) {
+  const prevHash = DATA ? contentHash(DATA) : null;
+  if (fileName) next.fileName = fileName;
+  DATA = next;
+  refreshFidMap();
+  STORE_KEY = "cluster-review:" + DATA.key;
+  const sig = dataSig(DATA);
+  const stored = load();
+  if (stored && stored.dataSig !== sig) {
+    if (!confirm("该数据键已有本地状态（可能来自旧数据或旧版本），继续会用新文件重建，旧标注将被覆盖。是否继续？")) {
+      return false;
+    }
+    state = buildInitial();
+  } else {
+    state = stored || buildInitial();
+  }
+  state.dataSig = sig;
+  state.fitted = false;
+  zoom = state.zoom || 1;
+  layout = state.layout || null;
+  const title = DATA.fileName ? `${DATA.fileName} · ${DATA.key || "-"}` : (DATA.key || "未加载");
+  document.title = "簇复核 · " + title;
+  const h1 = document.querySelector("header h1");
+  if (h1) h1.textContent = "簇复核 · " + title;
+  persistPayload(next);
+  applyZoom(zoom, false);
+  render();
+  save();
+  const same = prevHash && prevHash === contentHash(DATA) ? "（内容与上次相同）" : "";
+  toast(`已加载 ${DATA.fileName || DATA.key || "数据"} · ${DATA.clusters.length} 个簇${same}`);
+  return true;
+}
+
+function restoreLoadedPayload() {
+  const last = localStorage.getItem("cluster-review-last:" + PAGE_KEY);
+  if (!last) return;
+  const raw = localStorage.getItem("cluster-review-payload:" + last);
+  if (!raw) return;
+  try {
+    const next = JSON.parse(raw);
+    if (!next || !next.clusters || !next.clusters.length) return;
+    DATA = next;
+    STORE_KEY = "cluster-review:" + DATA.key;
+    state = load() || buildInitial();
+    zoom = state.zoom || 1;
+    layout = state.layout || null;
+    const title = DATA.fileName ? `${DATA.fileName} · ${DATA.key || "-"}` : (DATA.key || "未加载");
+    document.title = "簇复核 · " + title;
+    const h1 = document.querySelector("header h1");
+    if (h1) h1.textContent = "簇复核 · " + title;
+  } catch (e) {}
+}
+
+document.getElementById("load-file").onclick = () => document.getElementById("file-input").click();
+async function handleFile(file) {
+  if (!file) return;
+  try {
+    const text = await file.text();
+    let parsed;
+    try { parsed = JSON.parse(text); }
+    catch (jsonErr) {
+      parsed = text.trim().split(String.fromCharCode(10)).map(line => line.trim()).filter(Boolean).map(line => JSON.parse(line));
+    }
+    const built = fromClustersJson(parsed, keyFor(parsed, file));
+    if (!built.clusters.length) { alert("文件里没有多成员簇"); return; }
+    adoptData(built, file.name);
+  } catch (err) {
+    alert("解析失败：" + err.message);
+  }
+}
+
+document.getElementById("file-input").onchange = async e => {
+  await handleFile(e.target.files && e.target.files[0]);
+  e.target.value = "";
+};
+
+const stageEl = document.getElementById("stage");
+stageEl.addEventListener("dragover", e => {
+  if (e.dataTransfer && [...e.dataTransfer.types].includes("Files")) e.preventDefault();
+});
+stageEl.addEventListener("drop", async e => {
+  if (!e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files.length) return;
+  e.preventDefault();
+  await handleFile(e.dataTransfer.files[0]);
+});
+
+function deleteCluster(cid) {
+  const c = state.clusters[cid];
+  if (!c) return;
+  const left = c.core.length + c.out.length + c.inn.length;
+  if (left && !confirm(`簇 ${cid} 还有 ${left} 条未处理（core ${c.core.length} / OUT ${c.out.length} / IN ${c.inn.length}）。
+建议先把它们移到其他簇的 suspect IN 或垃圾桶，再删除。仍要删除？`)) return;
+  pushHistory();
+  state.deleted = state.deleted || [];
+  state.deleted.push({
+    cid: cid,
+    label: "1",
+    orig_core: (c.orig && c.orig.core ? c.orig.core : []).map(id => state.chips[id]).filter(Boolean),
+    time: Date.now()
+  });
+  [...c.core, ...c.out, ...c.inn].forEach(id => { delete state.chips[id]; });
+  delete state.clusters[cid];
+  state.order = state.order.filter(x => x !== cid);
+  (state.trash || []).forEach(t => { if (t.from === cid) t.from = null; });
+  save();
+  render();
+}
+
+let autoTimer = null, autoPointer = null;
+
+function trackPointer(x, y) {
+  autoPointer = { x: x, y: y };
+  if (!autoTimer) autoTimer = setInterval(autoStep, 30);
+}
+
+function inTrashZone(x, y) {
+  const trash = document.getElementById("trash");
+  if (!trash || trash.style.display === "none") return false;
+  const r = trash.getBoundingClientRect();
+  const pad = 12;
+  return x >= r.left - pad && x <= r.right + pad && y >= r.top - pad && y <= r.bottom + pad;
+}
+
+function autoStep() {
+  if (!autoPointer) return;
+  if (inTrashZone(autoPointer.x, autoPointer.y)) return;
+  const stage = document.getElementById("stage");
+  const r = stage.getBoundingClientRect();
+  const edge = 70, max = 22;
+  let dx = 0, dy = 0;
+  if (autoPointer.x < r.left + edge) dx = -max * Math.min(1, (r.left + edge - autoPointer.x) / edge);
+  else if (autoPointer.x > r.right - edge) dx = max * Math.min(1, (autoPointer.x - (r.right - edge)) / edge);
+  if (autoPointer.y < r.top + edge) dy = -max * Math.min(1, (r.top + edge - autoPointer.y) / edge);
+  else if (autoPointer.y > r.bottom - edge) dy = max * Math.min(1, (autoPointer.y - (r.bottom - edge)) / edge);
+  if (dx || dy) { stage.scrollBy(dx, dy); }
+}
+
+function stopAutoScroll() {
+  if (autoTimer) clearInterval(autoTimer);
+  autoTimer = null; autoPointer = null;
+}
+
+let toastTimer = null;
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 1400);
+}
+
+function copyText(text) {
+  const fallback = () => {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    ta.remove();
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).catch(fallback);
+  } else fallback();
+}
+
+function changedFromOrig(c) {
+  const base = (c.orig && c.orig.core) ? c.orig.core : [];
+  return c.core.length !== base.length || c.core.some(id => !base.includes(id));
+}
+
+function callCount(id) {
+  const parts = id.split(":");
+  const cid = parts[0], part = parts[1] || "";
+  if (part[0] === "c") {
+    const c = DATA.clusters.find(x => x.id === cid);
+    const idx = parseInt(part.slice(1), 10);
+    if (c && c.calls && !isNaN(idx)) return c.calls[idx] || 0;
+  }
+  return 0;
+}
+
+function clusterMeta(c) {
+  const calls = c.core.reduce((n, id) => n + callCount(id), 0);
+  const members = [...c.core, ...c.out];
+  const orig = (c.orig && c.orig.core) ? c.orig : { core: [], out: [], users: null, cohesion: null };
+  const base = [...orig.core, ...orig.out];
+  const same = members.length === base.length && members.every(id => base.includes(id));
+  const users = same && orig.users != null ? orig.users : "—";
+  const coh = same && orig.cohesion != null ? Number(orig.cohesion).toFixed(4) : "—";
+  const finalN = c.core.length + c.inn.length;
+  return `core ${c.core.length} · IN ${c.inn.length} · 最终 ${finalN} 条 / 内聚 ${coh}`;
+}
+
+function sameText(a, b) { return state.chips[a] === state.chips[b]; }
+
+function ensureFids() {
+  state.fids = state.fids || {};
+  const counters = {};
+  const bump = (id) => {
+    const cid = id.split(":")[0];
+    const fid = FID_MAP[id] || state.fids[id] || "";
+    const n = parseInt((fid.split(":Q")[1] || "0"), 10);
+    counters[cid] = Math.max(counters[cid] || 0, isNaN(n) ? 0 : n);
+  };
+  state.order.forEach(cid => {
+    const c = state.clusters[cid];
+    ["core", "out", "inn"].forEach(z => c[z].forEach(id => bump(id)));
+  });
+  (state.trash || []).forEach(t => bump(t.id));
+  Object.keys(state.chips).forEach(id => {
+    if (FID_MAP[id] || state.fids[id]) return;
+    const cid = id.split(":")[0];
+    counters[cid] = (counters[cid] || 0) + 1;
+    state.fids[id] = dispCid(cid) + ":Q" + counters[cid];
+  });
+}
+
+function fidOf(id) { return FID_MAP[id] || (state.fids && state.fids[id]) || id; }
+
+function dedupeState() {
+  Object.entries(state.clusters).forEach(([cid, c]) => {
+    if (/^N/.test(cid) && !c.label) c.label = "4";
+    if (c.orig && !c.orig.core) {
+      c.orig = { core: [...c.core], out: [...c.out], users: c.orig.users, cohesion: c.orig.cohesion };
+    }
+    const seen = new Set();
+    ["core", "out", "inn"].forEach(z => {
+      c[z] = c[z].filter(id => {
+        const t = state.chips[id];
+        if (seen.has(t)) return false;
+        seen.add(t);
+        return true;
+      });
+    });
+  });
+  const seenTrash = new Set();
+  state.trash = (state.trash || []).filter(t => {
+    const text = state.chips[t.id];
+    if (seenTrash.has(text)) return false;
+    seenTrash.add(text);
+    return true;
+  });
+}
+
+function ghostChip(id) {
+  const el = document.createElement("div");
+  el.className = "chip ghost";
+  const theme = (DATA.themes || {})[state.chips[id]];
+  el.textContent = fidOf(id) + " · " + (theme ? `【${theme}】` : "") + (state.chips[id] || id);
+  el.title = "原成员，已移出本簇";
+  el.draggable = false;
+  return el;
+}
+
+function ghostsOf(c, zone) {
+  const orig = (c.orig && c.orig[zone]) || [];
+  const everywhere = new Set([...c.core, ...c.out, ...c.inn]);
+  return orig.filter(id => !everywhere.has(id) && state.chips[id]);
+}
+
+function chipEl(id, zone) {
+  const el = document.createElement("div");
+  el.className = "chip " + (zone === "out" ? "out" : zone === "inn" ? "in" : "");
+  const theme = (DATA.themes || {})[state.chips[id]];
+  el.textContent = fidOf(id) + " · " + (theme ? `【${theme}】` : "") + state.chips[id];
+  el.title = state.chips[id];
+  el.draggable = true;
+  el.dataset.chip = id;
+  el.addEventListener("dragstart", e => {
+    e.dataTransfer.setData("text/plain", id);
+    trackPointer(e.clientX, e.clientY);
+  });
+  el.addEventListener("dragend", stopAutoScroll);
+  el.addEventListener("contextmenu", e => {
+    e.preventDefault(); e.stopPropagation();
+    const cid = id.split(":")[0];
+    moveChip(id, null, "trash");
+    state.outlierEvents = state.outlierEvents || [];
+    state.outlierEvents.push({ id: id, text: state.chips[id], from: cid, time: Date.now() });
+    save();
+    toast("已移入垃圾桶（Ctrl+Z 可撤销）");
+  });
+  el.addEventListener("dblclick", e => {
+    e.preventDefault(); e.stopPropagation();
+    copyText(state.chips[id]);
+    toast("已复制：" + state.chips[id]);
+  });
+  el.dataset.tip = el.textContent;
+  return el;
+}
+
+function render() {
+  const board = document.getElementById("board");
+  board.innerHTML = "";
+  ensureFids();
+  dedupeState();
+  const hint = document.getElementById("empty-hint");
+  if (hint) hint.style.display = DATA.clusters.length ? "none" : "flex";
+  if (!DATA.clusters.length) {
+    document.getElementById("stat").textContent = "未加载数据";
+    renderTrash();
+    board.style.width = "0px"; board.style.height = "0px";
+    resizeCanvas();
+    return;
+  }
+  const onlyUnlabeled = document.getElementById("only-unlabeled").checked;
+  let shown = 0;
+  state.order.forEach(cid => {
+    const c = state.clusters[cid];
+    if (onlyUnlabeled && c.label !== "") return;
+    shown++;
+    const wrap = document.createElement("section");
+    wrap.className = "cluster";
+    wrap.style.left = "0px"; wrap.style.top = "0px"; wrap.style.visibility = "hidden";
+    wrap.dataset.cid = cid;
+
+    const ovalWrap = document.createElement("div");
+    ovalWrap.className = "oval-wrap";
+    const oval = document.createElement("div");
+    oval.className = "oval";
+    oval.dataset.cid = cid;
+    oval.dataset.zone = "core";
+
+    const head = document.createElement("div");
+    head.className = "head";
+    head.innerHTML = `<span class="cid">簇 ${dispCid(cid)}</span><span class="meta">${clusterMeta(c)}</span>`;
+    const del = document.createElement("button");
+    del.className = "del"; del.textContent = "×"; del.title = "删除该簇（连带 slug/keywords/标注）";
+    del.onclick = e => { e.stopPropagation(); deleteCluster(cid); };
+    head.appendChild(del);
+    oval.addEventListener("mousedown", e => {
+      if (e.target.closest(".chip, button, input, a")) return;
+      startClusterDrag(e, cid, wrap);
+    });
+    oval.appendChild(head);
+
+    const bar = document.createElement("div");
+    bar.className = "labelbar";
+    [["0","正确"],["1","不正确"],["2","部分"],["4","新建"]].forEach(([v, t]) => {
+      const b = document.createElement("button");
+      b.textContent = t;
+      b.dataset.label = v;
+      if (c.label === v) b.classList.add("on");
+      b.onclick = () => {
+        pushHistory();
+        c.label = c.label === v ? "" : v;
+        save(); render();
+      };
+      bar.appendChild(b);
+    });
+    if (c.label === "3") { c.label = ""; c.no_action = true; }
+    const noAct = document.createElement("button");
+    noAct.type = "button";
+    noAct.className = "noaction" + (c.no_action ? " on" : "");
+    noAct.textContent = "不作处理";
+    noAct.title = "可选标记，不参与质量标签；是否治理由内部决定";
+    noAct.onclick = e => {
+      e.stopPropagation();
+      pushHistory();
+      c.no_action = !c.no_action;
+      save(); render();
+    };
+    bar.appendChild(noAct);
+    oval.appendChild(bar);
+
+    const core = document.createElement("div");
+    core.className = "chips";
+    core.dataset.cid = cid;
+    core.dataset.zone = "core";
+    c.core.forEach(id => {
+      const el = chipEl(id, "core");
+      if (!(c.orig && c.orig.core.includes(id))) {
+        el.classList.add("moved");
+        el.dataset.tip = el.textContent + "（从别处移入）";
+      }
+      core.appendChild(el);
+    });
+    ghostsOf(c, "core").forEach(id => core.appendChild(ghostChip(id)));
+    oval.appendChild(core);
+    if (!c.kws) c.kws = [{ slug: "", keywords: "" }];
+    const mb = document.createElement("div");
+    mb.className = "metablock";
+    const mh = document.createElement("div");
+    mh.className = "mhead";
+    mh.innerHTML = "<span>slug / keywords</span>";
+    const addRow = document.createElement("button");
+    addRow.type = "button"; addRow.textContent = "＋"; addRow.title = "添加一行";
+    addRow.onclick = e => { e.stopPropagation(); pushHistory(); c.kws.push({ slug: "", keywords: "" }); save(); render(); };
+    mh.appendChild(addRow);
+    mb.appendChild(mh);
+    c.kws.forEach((row, i) => {
+      const line = document.createElement("div");
+      line.className = "meta-row";
+      const sIn = document.createElement("input");
+      sIn.className = "slug"; sIn.placeholder = "slug"; sIn.value = row.slug || "";
+      sIn.oninput = e => { pushHistory("kw:" + cid + ":" + i + ":slug"); row.slug = e.target.value; save(); };
+      const kIn = document.createElement("input");
+      kIn.className = "kw"; kIn.placeholder = "keywords"; kIn.value = row.keywords || "";
+      kIn.oninput = e => { pushHistory("kw:" + cid + ":" + i + ":kw"); row.keywords = e.target.value; save(); };
+      const rm = document.createElement("button");
+      rm.type = "button"; rm.textContent = "−"; rm.title = "删除这一行";
+      rm.onclick = e => {
+        e.stopPropagation();
+        pushHistory();
+        c.kws.splice(i, 1);
+        if (!c.kws.length) c.kws.push({ slug: "", keywords: "" });
+        save(); render();
+      };
+      line.appendChild(sIn); line.appendChild(kIn); line.appendChild(rm);
+      mb.appendChild(line);
+    });
+    ovalWrap.appendChild(oval);
+
+    const side = document.createElement("div");
+    side.className = "side";
+    [["out","suspect OUT · 待处理","原簇成员；导出前必须移到某个簇的 IN 或垃圾桶"],
+     ["inn","suspect IN · 计入最终结果","最终聚类 = core + IN；不属于的请拖走"]].forEach(([zone, title, desc]) => {
+      const box = document.createElement("div");
+      box.className = "box";
+      box.dataset.cid = cid;
+      box.dataset.zone = zone;
+      const count = c[zone].length;
+      box.innerHTML = `<h4 title="${desc}">${title}（${count}）</h4>`;
+      const chips = document.createElement("div");
+      chips.className = "chips";
+      c[zone].forEach(id => chips.appendChild(chipEl(id, zone)));
+      ghostsOf(c, zone).forEach(id => chips.appendChild(ghostChip(id)));
+      box.appendChild(chips);
+      side.appendChild(box);
+    });
+    side.appendChild(mb);
+
+    wrap.appendChild(ovalWrap);
+    wrap.appendChild(side);
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.classList.add("wires");
+    wrap.appendChild(svg);
+    board.appendChild(wrap);
+  });
+
+  (state.deleted || []).forEach(d => {
+    if (onlyUnlabeled) return;
+    const wrap = document.createElement("section");
+    wrap.className = "cluster deleted";
+    wrap.style.left = "0px"; wrap.style.top = "0px"; wrap.style.visibility = "hidden";
+    wrap.dataset.cid = d.cid;
+
+    const ovalWrap = document.createElement("div");
+    ovalWrap.className = "oval-wrap";
+    const oval = document.createElement("div");
+    oval.className = "oval";
+    oval.dataset.cid = d.cid;
+
+    const head = document.createElement("div");
+    head.className = "head";
+    head.innerHTML = `<span class="cid">簇 ${dispCid(d.cid)}</span><span class="del-badge">已删除 · 判定整簇错误</span>`;
+    oval.addEventListener("mousedown", e => {
+      if (e.target.closest(".chip, button, input, a")) return;
+      startClusterDrag(e, d.cid, wrap);
+    });
+    oval.appendChild(head);
+
+    const core = document.createElement("div");
+    core.className = "chips";
+    (d.orig_core || []).forEach((text, i) => {
+      const el = document.createElement("div");
+      el.className = "chip ghost";
+      el.textContent = dispCid(d.cid) + ":Q" + (i + 1) + " · " + text;
+      core.appendChild(el);
+    });
+    oval.appendChild(core);
+    ovalWrap.appendChild(oval);
+
+    const side = document.createElement("div");
+    side.className = "side";
+    [["out","suspect OUT · 待处理"],["inn","suspect IN · 计入最终结果"]].forEach(([, title]) => {
+      const box = document.createElement("div");
+      box.className = "box";
+      box.innerHTML = `<h4>${title}（0）</h4><div class="chips"></div>`;
+      side.appendChild(box);
+    });
+
+    wrap.appendChild(ovalWrap);
+    wrap.appendChild(side);
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.classList.add("wires");
+    wrap.appendChild(svg);
+    board.appendChild(wrap);
+  });
+
+  const boardEl = document.getElementById("board");
+  boardEl.style.width = "6000px";
+  boardEl.style.height = "4000px";
+  if (state.layoutVer !== LAYOUT_VER) layout = null;
+  const cards = [...document.querySelectorAll(".cluster")];
+  const missing = cards.filter(c => !layout || !layout[c.dataset.cid]);
+  if (missing.length) {
+    layout = Object.assign(computeLayout(missing), layout || {});
+    state.layoutVer = LAYOUT_VER;
+    save();
+  }
+  cards.forEach(card => {
+    const p = layout[card.dataset.cid] || [0, 0];
+    card.style.left = p[0] + "px"; card.style.top = p[1] + "px";
+    card.style.visibility = "visible";
+  });
+  sizeBoard(cards);
+  drawWires();
+  renderTrash();
+  const labeled = state.order.filter(cid => state.clusters[cid].label !== "").length;
+  if (!state.fitted) { state.fitted = true; fitAll(); save(); }
+  const fileTag = DATA.fileName ? `文件 ${DATA.fileName} · ` : "";
+  const srcTag = DATA.source ? `${DATA.source} · ` : "";
+  document.getElementById("stat").textContent =
+    `${fileTag}${srcTag}指纹 ${contentHash(DATA)} · 共 ${state.order.length} 个簇，已标 ${labeled}${shown !== state.order.length ? `，当前显示 ${shown}` : ""}`;
+}
+
+function computeLayout(cards) {
+  const GAP = 50;
+  const sizes = cards.map(c => ({w: c.offsetWidth || 400, h: c.offsetHeight || 200}));
+  const order = sizes.map((s, i) => i).sort((a, b) => sizes[b].h - sizes[a].h || sizes[b].w - sizes[a].w);
+  const pos = new Array(cards.length).fill(null);
+  const placed = [];
+  for (const idx of order) {
+    const s = sizes[idx];
+    if (!placed.length) { pos[idx] = {x: 0, y: 0}; placed.push(idx); continue; }
+    let spot = null;
+    for (let ring = 0; ring < 80 && !spot; ring++) {
+      const radius = ring * 70;
+      const steps = ring === 0 ? 1 : Math.max(10, ring * 8);
+      for (let k = 0; k < steps; k++) {
+        const jitter = Math.sin(idx * 12.9898 + ring * 78.233 + k * 3.7) * 0.5 + 0.5;
+        const ang = (k / steps) * Math.PI * 2 + ring * 0.77 + (jitter - 0.5) * 0.45;
+        const rad = radius + (jitter - 0.5) * 60;
+        const x = Math.cos(ang) * rad, y = Math.sin(ang) * rad;
+        let ok = true;
+        for (const j of placed) {
+          const o = sizes[j], p = pos[j];
+          if (Math.abs(x - p.x) < (s.w + o.w) / 2 + GAP &&
+              Math.abs(y - p.y) < (s.h + o.h) / 2 + GAP) { ok = false; break; }
+        }
+        if (ok) { spot = {x, y}; break; }
+      }
+    }
+    pos[idx] = spot || {x: 0, y: placed.length * 220};
+    placed.push(idx);
+  }
+  const minX = Math.min(...pos.map((p, i) => p.x - sizes[i].w / 2));
+  const minY = Math.min(...pos.map((p, i) => p.y - sizes[i].h / 2));
+  const out = {};
+  cards.forEach((c, i) => {
+    out[c.dataset.cid] = [Math.round(pos[i].x - sizes[i].w / 2 - minX + 40),
+                          Math.round(pos[i].y - sizes[i].h / 2 - minY + 40)];
+  });
+  return out;
+}
+
+function sizeBoard(cards) {
+  const board = document.getElementById("board");
+  let maxR = 0, maxB = 0;
+  cards.forEach(c => { maxR = Math.max(maxR, c.offsetLeft + c.offsetWidth); maxB = Math.max(maxB, c.offsetTop + c.offsetHeight); });
+  board.style.width = (maxR + 60) + "px";
+  board.style.height = (maxB + 60) + "px";
+  resizeCanvas();
+}
+
+function mergeClusters(fromCid, toCid) {
+  const from = state.clusters[fromCid], to = state.clusters[toCid];
+  if (!from || !to || fromCid === toCid) return;
+  if (!confirm(`合并簇 ${fromCid} 到 ${toCid}？
+成员会进入目标簇的 suspect IN，源簇将被删除。`)) return;
+  pushHistory();
+  const taken = new Set([...to.core, ...to.out, ...to.inn].map(id => state.chips[id]));
+  const moved = [];
+  [...from.core, ...from.out, ...from.inn].forEach(id => {
+    const text = state.chips[id];
+    if (taken.has(text)) return;
+    taken.add(text);
+    to.inn.push(id);
+    moved.push(id);
+  });
+  state.mergeEvents = state.mergeEvents || [];
+  state.mergeEvents.push({ from: fromCid, to: toCid, moved: moved.length, time: Date.now() });
+  delete state.clusters[fromCid];
+  state.order = state.order.filter(x => x !== fromCid);
+  if (layout) delete layout[fromCid];
+  save(); render();
+  toast(`已合并 ${fromCid} → ${toCid}，移入 ${moved.length} 条`);
+}
+
+function startClusterDrag(e, cid, wrap) {
+  if (e.button !== 0) return;
+  e.preventDefault();
+  const sx = e.clientX, sy = e.clientY;
+  const [x0, y0] = layout[cid] || [0, 0];
+  let tx = x0, ty = y0, cx = x0, cy = y0;
+  let sideX = 0, sideY = 0, svx = 0, svy = 0;
+  let pushed = false, dragging = true, rafId = 0;
+  const side = wrap.querySelector(".side");
+  let last = { x: e.clientX, y: e.clientY };
+  wrap.classList.add("dragging");
+
+  function findMergeTarget(clientX, clientY) {
+    wrap.style.pointerEvents = "none";
+    const hit = document.elementFromPoint(clientX, clientY);
+    wrap.style.pointerEvents = "";
+    const target = hit && hit.closest(".cluster:not(.deleted)");
+    return (target && target !== wrap) ? target : null;
+  }
+
+  function tick() {
+    const dx = tx - cx, dy = ty - cy;
+    cx += dx * 0.3;
+    cy += dy * 0.3;
+    const targetSx = -dx * 0.34, targetSy = -dy * 0.34;
+    svx = (svx + (targetSx - sideX) * 0.2) * 0.72;
+    svy = (svy + (targetSy - sideY) * 0.2) * 0.72;
+    sideX += svx;
+    sideY += svy;
+
+    wrap.style.transform = `translate3d(${(cx - x0).toFixed(2)}px, ${(cy - y0).toFixed(2)}px, 0)`;
+    if (side) side.style.transform = `translate3d(${sideX.toFixed(2)}px, ${sideY.toFixed(2)}px, 0)`;
+    drawClusterWires(wrap);
+
+    const stillMoving = Math.abs(dx) > 0.15 || Math.abs(dy) > 0.15 || Math.abs(sideX) > 0.15 || Math.abs(sideY) > 0.15 || Math.abs(svx) > 0.08 || Math.abs(svy) > 0.08;
+    if (dragging || stillMoving) {
+      rafId = requestAnimationFrame(tick);
+    } else {
+      wrap.style.transform = "";
+      wrap.style.left = tx + "px";
+      wrap.style.top = ty + "px";
+      if (side) side.style.transform = "";
+      drawClusterWires(wrap);
+      sizeBoard([...document.querySelectorAll(".cluster")]);
+    }
+  }
+
+  function move(ev) {
+    if (!pushed) { pushHistory(); pushed = true; }
+    last = { x: ev.clientX, y: ev.clientY };
+    trackPointer(ev.clientX, ev.clientY);
+    tx = Math.round(x0 + (ev.clientX - sx) / zoom);
+    ty = Math.round(y0 + (ev.clientY - sy) / zoom);
+    layout[cid] = [tx, ty];
+    document.querySelectorAll(".cluster.merge-target").forEach(el => el.classList.remove("merge-target"));
+    const target = findMergeTarget(ev.clientX, ev.clientY);
+    if (target) target.classList.add("merge-target");
+  }
+
+  function up() {
+    dragging = false;
+    wrap.classList.remove("dragging");
+    document.removeEventListener("mousemove", move);
+    document.removeEventListener("mouseup", up);
+    stopAutoScroll();
+    const target = findMergeTarget(last.x, last.y);
+    document.querySelectorAll(".cluster.merge-target").forEach(el => el.classList.remove("merge-target"));
+    save();
+    if (target) {
+      cancelAnimationFrame(rafId);
+      wrap.style.transform = "";
+      if (side) side.style.transform = "";
+      mergeClusters(cid, target.dataset.cid);
+    }
+  }
+
+  rafId = requestAnimationFrame(tick);
+  document.addEventListener("mousemove", move);
+  document.addEventListener("mouseup", up);
+}
+
+function drawClusterWires(wrap) {
+  const oval = wrap.querySelector(".oval");
+  const svg = wrap.querySelector("svg.wires");
+  const boxes = wrap.querySelectorAll(".box");
+  if (!oval || !svg || !boxes.length) return;
+  const base = wrap.getBoundingClientRect();
+  const z = zoom || 1;
+  svg.setAttribute("width", base.width / z);
+  svg.setAttribute("height", base.height / z);
+  const o = oval.getBoundingClientRect();
+  const startX = (o.right - base.left) / z;
+  const startY = (o.top - base.top + o.height / 2) / z;
+  let paths = svg.querySelectorAll("path");
+  if (paths.length !== boxes.length) {
+    svg.innerHTML = "";
+    boxes.forEach(() => {
+      const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      p.setAttribute("stroke", "#94a3b8");
+      p.setAttribute("stroke-width", "1.5");
+      p.setAttribute("fill", "none");
+      svg.appendChild(p);
+    });
+    paths = svg.querySelectorAll("path");
+  }
+  boxes.forEach((box, i) => {
+    const b = box.getBoundingClientRect();
+    const endX = (b.left - base.left) / z;
+    const endY = (b.top - base.top + b.height / 2) / z;
+    const midX = (startX + endX) / 2;
+    paths[i].setAttribute("d", `M ${startX} ${startY} C ${midX} ${startY}, ${midX} ${endY}, ${endX} ${endY}`);
+  });
+}
+
+function drawWires() {
+  document.querySelectorAll(".cluster").forEach(drawClusterWires);
+}
+window.addEventListener("resize", drawWires);
+window.addEventListener("keydown", e => { if (e.key === "Control" || e.key === "Meta") document.getElementById("stage").classList.add("pan-mode"); });
+window.addEventListener("keyup", e => { if (e.key === "Control" || e.key === "Meta") document.getElementById("stage").classList.remove("pan-mode"); });
+window.addEventListener("blur", () => document.getElementById("stage").classList.remove("pan-mode"));
+
+let panRaf = 0;
+document.getElementById("stage").addEventListener("mousedown", e => {
+  if (e.button !== 0) return;
+  if (e.target.closest(".cluster, #trash, button, input, select, textarea")) return;
+  e.preventDefault();
+  cancelAnimationFrame(panRaf);
+  const stage = e.currentTarget;
+  const sx = e.clientX, sy = e.clientY;
+  const l0 = stage.scrollLeft, t0 = stage.scrollTop;
+  let targetL = l0, targetT = t0;
+  let curL = l0, curT = t0;
+  let vx = 0, vy = 0, lastX = sx, lastY = sy, lastT = performance.now();
+  let dragging = true;
+  stage.classList.add("panning");
+
+  function panTick() {
+    if (dragging) {
+      curL += (targetL - curL) * 0.42;
+      curT += (targetT - curT) * 0.42;
+      stage.scrollLeft = curL;
+      stage.scrollTop = curT;
+      panRaf = requestAnimationFrame(panTick);
+    } else {
+      curL += vx;
+      curT += vy;
+      vx *= 0.92;
+      vy *= 0.92;
+      stage.scrollLeft = curL;
+      stage.scrollTop = curT;
+      if (Math.abs(vx) > 0.25 || Math.abs(vy) > 0.25) {
+        panRaf = requestAnimationFrame(panTick);
+      } else {
+        stage.classList.remove("panning");
+      }
+    }
+  }
+
+  function mv(ev) {
+    const now = performance.now();
+    const dt = Math.max(4, now - lastT);
+    const instVx = ((lastX - ev.clientX) / dt) * 16;
+    const instVy = ((lastY - ev.clientY) / dt) * 16;
+    vx = vx * 0.45 + instVx * 0.55;
+    vy = vy * 0.45 + instVy * 0.55;
+    lastX = ev.clientX; lastY = ev.clientY; lastT = now;
+    targetL = Math.max(0, l0 - (ev.clientX - sx));
+    targetT = Math.max(0, t0 - (ev.clientY - sy));
+  }
+
+  function up() {
+    dragging = false;
+    if (performance.now() - lastT > 80) { vx = 0; vy = 0; stage.classList.remove("panning"); }
+    document.removeEventListener("mousemove", mv);
+    document.removeEventListener("mouseup", up);
+  }
+
+  panRaf = requestAnimationFrame(panTick);
+  document.addEventListener("mousemove", mv);
+  document.addEventListener("mouseup", up);
+});
+
+function findZone(target) {
+  return target.closest("[data-zone]");
+}
+function moveChip(chipId, cid, zone) {
+  pushHistory();
+  state.trash = state.trash || [];
+  const ownerCid = Object.keys(state.clusters).find(k => {
+    const c = state.clusters[k];
+    return c.core.includes(chipId) || c.out.includes(chipId) || c.inn.includes(chipId);
+  });
+  const inTrash = state.trash.some(t => t.id === chipId);
+  const dropEverywhere = () => Object.values(state.clusters)
+    .forEach(c => ["core","out","inn"].forEach(k => { c[k] = c[k].filter(x => x !== chipId); }));
+  if (zone === "trash") {
+    if (!ownerCid) return;
+    dropEverywhere();
+    state.trash = state.trash.filter(t => t.id !== chipId);
+    state.trash.push({ id: chipId, from: ownerCid });
+    save(); render(); return;
+  }
+  if (!ownerCid && !inTrash) return;
+  if (zone === "core") { toast("core 只出不进：新增成员请拖到该簇的 suspect IN"); return; }
+  dropEverywhere();
+  state.trash = state.trash.filter(t => t.id !== chipId);
+  const target = state.clusters[cid];
+  if (target) {
+    const text = state.chips[chipId];
+    const dup = [...target.core, ...target.out, ...target.inn].find(x => state.chips[x] === text);
+    if (dup) {
+      toast("该 query 已在目标簇中，未重复加入：" + text);
+      save(); render(); return;
+    }
+    target[zone].push(chipId);
+  }
+  save(); render();
+}
+
+function restoreTrash(chipId) {
+  pushHistory();
+  state.trash = state.trash || [];
+  const item = state.trash.find(t => t.id === chipId);
+  if (!item) return;
+  const target = state.clusters[item.from];
+  if (!target) { alert("原簇已删除，请直接拖到目标簇"); return; }
+  state.trash = state.trash.filter(t => t.id !== chipId);
+  target.core.push(chipId);
+  save(); render();
+}
+
+function renderTrash() {
+  const panel = document.getElementById("trash");
+  if (!panel) return;
+  state.trash = state.trash || [];
+  panel.style.display = DATA.clusters.length ? "flex" : "none";
+  document.getElementById("trash-count").textContent = state.trash.length;
+  const list = document.getElementById("trash-list");
+  list.innerHTML = "";
+  if (!state.trash.length) {
+    const tip = document.createElement("div");
+    tip.className = "trash-tip";
+    tip.textContent = "把不可获取 / 无法归簇的 query 拖进来";
+    list.appendChild(tip);
+    return;
+  }
+  state.trash.forEach(item => {
+    const wrap = document.createElement("div");
+    wrap.className = "trash-item";
+    wrap.appendChild(chipEl(item.id, "trash"));
+    const back = document.createElement("button");
+    back.type = "button"; back.textContent = "↩"; back.title = "放回原簇";
+    back.onclick = e => { e.stopPropagation(); restoreTrash(item.id); };
+    wrap.appendChild(back);
+    list.appendChild(wrap);
+  });
+}
+
+["dragover","dragenter"].forEach(evt => document.addEventListener(evt, e => {
+  if (e.dataTransfer && [...e.dataTransfer.types].includes("text/plain")) trackPointer(e.clientX, e.clientY);
+  const z = findZone(e.target);
+  if (z) { e.preventDefault(); z.classList.add("zone-hot"); }
+}));
+document.addEventListener("drop", stopAutoScroll);
+["dragleave","drop"].forEach(evt => document.addEventListener(evt, e => {
+  const z = findZone(e.target);
+  if (z) z.classList.remove("zone-hot");
+}));
+document.addEventListener("drop", e => {
+  const z = findZone(e.target);
+  if (!z) return;
+  e.preventDefault();
+  const chipId = e.dataTransfer.getData("text/plain");
+  if (chipId) moveChip(chipId, z.dataset.cid, z.dataset.zone);
+});
+
+function csvEscape(v) { return '"' + String(v).replace(/"/g, '""') + '"'; }
+
+function filledKws(c) {
+  return (c.kws || []).filter(r => String(r.slug || "").trim() || String(r.keywords || "").trim());
+}
+
+function findDuplicates() {
+  const map = new Map();
+  const add = (text, cid, label) => {
+    if (!map.has(text)) map.set(text, []);
+    map.get(text).push({ cid, label });
+  };
+  state.order.forEach(cid => {
+    const c = state.clusters[cid];
+    c.core.forEach(id => add(state.chips[id], cid, c.label));
+  });
+  (state.trash || []).forEach(t => add(state.chips[t.id], "TRASH", "3"));
+  return [...map.entries()].filter(([, arr]) => arr.length > 1);
+}
+
+function showDuplicates() {
+  const list = document.getElementById("dup-list");
+  const dups = findDuplicates();
+  document.getElementById("dup-count").textContent = dups.length ? `（${dups.length} 条）` : "";
+  list.innerHTML = "";
+  if (!dups.length) {
+    const empty = document.createElement("div");
+    empty.className = "trash-tip";
+    empty.textContent = "没有重复的 query";
+    list.appendChild(empty);
+  }
+  dups.forEach(([text, places]) => {
+    const item = document.createElement("div");
+    item.className = "dup-item";
+    const title = document.createElement("div");
+    title.className = "dup-text";
+    title.textContent = text;
+    item.appendChild(title);
+    const loc = document.createElement("div");
+    loc.className = "dup-loc";
+    places.forEach(pl => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = (pl.cid === "TRASH" ? "垃圾桶" : "簇 " + pl.cid) + (pl.label ? " · label " + pl.label : " · 未标");
+      b.onclick = () => {
+        document.getElementById("dup-modal").classList.remove("show");
+        if (pl.cid === "TRASH") { document.getElementById("trash").scrollIntoView({ block: "nearest" }); return; }
+        const card = document.querySelector('.cluster[data-cid="' + pl.cid + '"]');
+        if (!card) return;
+        card.scrollIntoView({ block: "center", inline: "center" });
+        card.classList.add("flash");
+        setTimeout(() => card.classList.remove("flash"), 1400);
+      };
+      loc.appendChild(b);
+    });
+    item.appendChild(loc);
+    list.appendChild(item);
+  });
+  document.getElementById("dup-modal").classList.add("show");
+}
+
+document.getElementById("help-btn").onclick = () => document.getElementById("help-modal").classList.add("show");
+document.getElementById("help-close").onclick = () => document.getElementById("help-modal").classList.remove("show");
+document.getElementById("help-modal").addEventListener("click", e => {
+  if (e.target.id === "help-modal") e.currentTarget.classList.remove("show");
+});
+document.getElementById("dup-check").onclick = showDuplicates;
+document.getElementById("dup-close").onclick = () => document.getElementById("dup-modal").classList.remove("show");
+document.getElementById("dup-modal").addEventListener("click", e => {
+  if (e.target.id === "dup-modal") e.currentTarget.classList.remove("show");
+});
+
+function exportPreflight() {
+  const counts = {};
+  state.order.forEach(cid => {
+    state.clusters[cid].core.forEach(id => {
+      const t = state.chips[id];
+      counts[t] = (counts[t] || 0) + 1;
+    });
+  });
+  const dups = Object.entries(counts).filter(([, n]) => n > 1);
+  const unlabeled = state.order.filter(cid => !state.clusters[cid].label).length;
+  const stale = state.order.filter(cid => changedFromOrig(state.clusters[cid])).length;
+  const outPending = state.order.filter(cid => state.clusters[cid].out.length).length;
+  const msgs = [];
+  if (dups.length) msgs.push(`${dups.length} 条 query 同时出现在多个簇里（点顶部「查重」看具体条目）`);
+  if (unlabeled) msgs.push(`${unlabeled} 个簇还没有标签`);
+  if (stale) msgs.push(`${stale} 个簇的 core 与原簇不同`);
+  if (outPending) msgs.push(`${outPending} 个簇还有 suspect OUT 未处理`);
+  if (msgs.length && !confirm(msgs.join("；") + "。仍要导出吗？")) return false;
+  return true;
+}
+
+async function saveFile(name, text, mime, ext, desc) {
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: name,
+        types: [{ description: desc, accept: { [mime]: [ext] } }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(new Blob([text], { type: mime }));
+      await writable.close();
+      return;
+    } catch (err) {
+      if (err && err.name === "AbortError") return;
+    }
+  }
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text], { type: mime }));
+  a.download = name;
+  a.click();
+}
+document.getElementById("export-csv").onclick = () => {
+  if (!exportPreflight()) return;
+  const rows = [["cluster_id", "display_id", "label", "is_new", "no_action",
+                 "core_size", "suspect_in_size", "final_size", "is_empty", "cohesion",
+                 "final_ids", "final", "core_ids", "core",
+                 "suspect_in_ids", "suspect_in", "suspect_out", "slugs", "keywords"]];
+  state.order.forEach(cid => {
+    const c = state.clusters[cid];
+    const final = [...c.core, ...c.inn];
+    const coh = c.orig && c.orig.cohesion != null ? c.orig.cohesion : "";
+    rows.push([cid, dispCid(cid), c.label, /^N/.test(cid) ? "1" : "0", c.no_action ? "1" : "0",
+               c.core.length, c.inn.length, final.length, final.length ? "0" : "1", coh,
+               final.map(fidOf).join("##"),
+               final.map(id => state.chips[id]).join("##"),
+               c.core.map(fidOf).join("##"),
+               c.core.map(id => state.chips[id]).join("##"),
+               c.inn.map(fidOf).join("##"),
+               c.inn.map(id => state.chips[id]).join("##"),
+               c.out.map(id => state.chips[id]).join("##"),
+               filledKws(c).map(r => r.slug).join("##"),
+               filledKws(c).map(r => r.keywords).join("##")]);
+  });
+  if ((state.trash || []).length) {
+    const trashText = state.trash.map(t => state.chips[t.id]);
+    rows.push(["TRASH", "TRASH", "", "0", "1",
+               0, 0, trashText.length, trashText.length ? "0" : "1", "",
+               state.trash.map(t => t.id).join("##"), trashText.join("##"),
+               "", "", "", "", "", "", ""]);
+  }
+  const text = "\ufeff" + rows.map(r => r.map(csvEscape).join(",")).join("\n");
+  saveFile((DATA.key || "review") + "_review.csv", text, "text/csv", ".csv", "CSV 文件");
+};
+document.getElementById("export-json").onclick = () => {
+  if (!exportPreflight()) return;
+  const out = state.order.map(cid => {
+    const c = state.clusters[cid];
+    return {cluster_id: cid, label: c.label,
+            core: c.core.map(id => state.chips[id]),
+            suspect_out: c.out.map(id => state.chips[id]),
+            suspect_in: c.inn.map(id => state.chips[id]),
+            slug_keywords: filledKws(c),
+            orig_core: (c.orig && c.orig.core ? c.orig.core : []).map(id => state.chips[id]).filter(Boolean),
+            final_members: [...c.core, ...c.inn].map(id => state.chips[id]).filter(Boolean),
+            removed: (c.orig && c.orig.core ? c.orig.core : [])
+                       .filter(id => !c.core.includes(id)).map(id => state.chips[id]).filter(Boolean),
+            core_ids: c.core.map(fidOf),
+            suspect_out_ids: c.out.map(fidOf),
+            suspect_in_ids: c.inn.map(fidOf),
+            final_ids: [...c.core, ...c.inn].map(fidOf),
+            removed_ids: (c.orig && c.orig.core ? c.orig.core : []).filter(id => !c.core.includes(id)).map(fidOf),
+            no_action: !!c.no_action,
+            is_new: c.label === "4",
+            edited_from_original: changedFromOrig(c)};
+  });
+  if ((state.trash || []).length) {
+    out.push({ cluster_id: "TRASH", label: "", no_action: true, core: state.trash.map(t => state.chips[t.id]),
+               suspect_out: [], suspect_in: [], slug_keywords: [] });
+  }
+  if ((state.mergeEvents || []).length || (state.outlierEvents || []).length) {
+    out.push({ cluster_id: "_EVENTS", merge_events: state.mergeEvents || [],
+               outlier_events: state.outlierEvents || [] });
+  }
+  (state.deleted || []).forEach(d => {
+    out.push({ cluster_id: d.cid, label: "1", core: [], suspect_out: [], suspect_in: [],
+               slug_keywords: [], orig_core: d.orig_core, final_members: [], removed: d.orig_core,
+               edited_from_original: true, deleted: true });
+  });
+  saveFile((DATA.key || "review") + "_labels.json", JSON.stringify(out, null, 2), "application/json", ".json", "JSON 文件");
+};
+function findFreeSpot(w, h, excludeId) {
+  const GAP = 50;
+  const stage = document.getElementById("stage");
+  const cx = (stage.scrollLeft + stage.clientWidth / 2) / zoom;
+  const cy = (stage.scrollTop + stage.clientHeight / 2) / zoom;
+  const others = [...document.querySelectorAll(".cluster")]
+    .filter(c => c.dataset.cid !== excludeId)
+    .map(c => ({x: c.offsetLeft, y: c.offsetTop, w: c.offsetWidth, h: c.offsetHeight}));
+  const free = (x, y) => others.every(o =>
+    Math.abs((x + w / 2) - (o.x + o.w / 2)) >= (w + o.w) / 2 + GAP ||
+    Math.abs((y + h / 2) - (o.y + o.h / 2)) >= (h + o.h) / 2 + GAP);
+  for (let ring = 0; ring < 80; ring++) {
+    const rad = ring * 70;
+    const steps = ring ? Math.max(12, ring * 8) : 1;
+    for (let k = 0; k < steps; k++) {
+      const ang = (k / steps) * Math.PI * 2 + ring * 0.77;
+      const x = Math.max(0, Math.round(cx + Math.cos(ang) * rad - w / 2));
+      const y = Math.max(0, Math.round(cy + Math.sin(ang) * rad - h / 2));
+      if (free(x, y)) return [x, y];
+    }
+  }
+  return [Math.max(0, Math.round(cx - w / 2)), Math.max(0, Math.round(cy - h / 2))];
+}
+
+document.getElementById("new-cluster").onclick = () => {
+  pushHistory();
+  let id;
+  do {
+    state.seq = (state.seq || 0) + 1;
+    id = "N" + String(state.seq).padStart(2, "0");
+  } while (state.clusters[id]);
+  state.clusters[id] = { meta: "新建簇（把 query 拖进来）", core: [], out: [], inn: [], label: "4", no_action: false,
+                         kws: [{ slug: "", keywords: "" }], orig: { core: [], out: [], users: null, cohesion: null } };
+  state.order.push(id);
+  const stage = document.getElementById("stage");
+  layout = layout || {};
+  layout[id] = [Math.max(0, Math.round((stage.scrollLeft + stage.clientWidth / 2) / zoom - 260)),
+                Math.max(0, Math.round((stage.scrollTop + stage.clientHeight / 2) / zoom - 120))];
+  save(); render();
+  const el = document.querySelector('.cluster[data-cid="' + id + '"]');
+  if (el) {
+    layout[id] = findFreeSpot(el.offsetWidth, el.offsetHeight, id);
+    save(); render();
+  }
+};
+
+document.getElementById("trash-toggle").onclick = e => {
+  const list = document.getElementById("trash-list");
+  const collapsed = list.style.display === "none";
+  list.style.display = collapsed ? "flex" : "none";
+  e.target.textContent = collapsed ? "收起" : "展开";
+};
+document.getElementById("relayout").onclick = () => { pushHistory(); layout = null; save(); render(); };
+document.getElementById("reset").onclick = () => {
+  if (!confirm("清空本地标注并恢复初始状态？")) return;
+  localStorage.removeItem(STORE_KEY);
+  location.reload();
+};
+document.getElementById("only-unlabeled").onchange = render;
+document.getElementById("zoom-in").onclick = () => applyZoom(zoom + 0.1);
+document.getElementById("zoom-out").onclick = () => applyZoom(zoom - 0.1);
+document.getElementById("zoom-reset").onclick = () => applyZoom(1);
+function fitAll() {
+  const board = document.getElementById("board");
+  const bw = parseFloat(board.style.width) || board.offsetWidth;
+  const bh = parseFloat(board.style.height) || board.offsetHeight;
+  const stage = document.getElementById("stage");
+  const zx = (stage.clientWidth - 40) / bw;
+  const zy = (stage.clientHeight - 40) / bh;
+  applyZoom(Math.max(0.1, Math.floor(Math.min(zx, zy) * 100) / 100));
+  stage.scrollTo(0, 0);
+}
+document.getElementById("zoom-fit").onclick = fitAll;
+window.addEventListener("wheel", e => {
+  if (!e.ctrlKey && !e.metaKey) return;
+  e.preventDefault();
+  applyZoom(zoom + (e.deltaY < 0 ? 0.1 : -0.1));
+}, { passive: false });
+window.addEventListener("keydown", e => {
+  const tag = (document.activeElement || {}).tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA") return;
+  if (!(e.ctrlKey || e.metaKey)) return;
+  const k = e.key.toLowerCase();
+  if (k === "z" && !e.shiftKey) { e.preventDefault(); undo(); return; }
+  if (k === "y" || (k === "z" && e.shiftKey)) { e.preventDefault(); redo(); return; }
+  if (e.key === "=" || e.key === "+") { e.preventDefault(); applyZoom(zoom + 0.1); }
+  if (e.key === "-") { e.preventDefault(); applyZoom(zoom - 0.1); }
+  if (e.key === "0") { e.preventDefault(); applyZoom(1); }
+});
+restoreLoadedPayload();
+applyZoom(zoom, false);
+render();
+document.title = __TITLE__;
+const pageTitle = document.querySelector("header h1");
+if (pageTitle) pageTitle.textContent = __TITLE__;
+</script>
+</body>
+</html>

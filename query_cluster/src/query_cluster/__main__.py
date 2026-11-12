@@ -20,6 +20,7 @@ from .llm_review import DEFAULT_INSTRUCTIONS, LLMReviewError, review as llm_revi
 from .manual import load_rules
 from .pipeline import build_clusters, load_input, write_result
 from .qk import match
+from .review.server import serve as serve_review
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -39,6 +40,11 @@ def main(argv: list[str] | None = None) -> int:
     p_review = sub.add_parser("review", help="从已有 clusters.json 生成复核页")
     p_review.add_argument("--clusters", required=True)
     p_review.add_argument("--out", required=True)
+
+    p_serve = sub.add_parser("serve", help="启动新的 ReviewState 本地复核服务")
+    p_serve.add_argument("--state", required=True, help="state.json")
+    p_serve.add_argument("--host", default="127.0.0.1")
+    p_serve.add_argument("--port", type=int, default=8765)
 
     p_qk = sub.add_parser("qk", help="单条 query 的 QK 双路匹配")
     p_qk.add_argument("query")
@@ -86,6 +92,9 @@ def main(argv: list[str] | None = None) -> int:
         path = build_canvas(payload, out_path, key=out_path.parent.name)
         print(f"复核页：{path}")
         return 0
+
+    if args.cmd == "serve":
+        return serve_review(args.state, args.host, args.port)
 
     if args.cmd == "llm-review":
         instructions = args.instructions

@@ -5,7 +5,7 @@ Query 聚类复核与 QK 召回验证的工作区，包含两个互不依赖的�
 - `query_cluster/`：词表输入、自动聚类、LLM 初审、人工复核；
 - `qk_validation/`：QK 词表匹配与召回验证。
 
-当前 S0 目录搬迁、S1 实体层、S2 输入/预处理/自动聚类、S3 LLM 归类/命名已落地；复核页仍按 `DESIGN_LLM_REVIEW.md` 在后续阶段重构。
+当前 S0 目录搬迁、S1 实体层、S2 输入/预处理/自动聚类、S3 LLM 归类/命名、S4 本地复核服务已落地；变更对比仍按 `DESIGN_LLM_REVIEW.md` 在后续阶段实现。
 
 ## 目录
 
@@ -39,6 +39,14 @@ uv sync --all-packages
 uv run --package query-cluster python -m query_cluster cluster `
   --input query_cluster/examples/inputs.txt --backend hash --state `
   --out query_cluster/out
+
+# LLM 两阶段复核
+uv run --package query-cluster python -m query_cluster llm-review --state `
+  --clusters query_cluster/out/state.json --out query_cluster/out/llm
+
+# 本地复核服务
+uv run --package query-cluster python -m query_cluster serve `
+  --state query_cluster/out/state.json
 
 # 旧链路：输出 clusters.json + review.html
 uv run --package query-cluster python -m query_cluster cluster `

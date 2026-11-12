@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-TEMPLATE = Path(__file__).resolve().parents[2] / "templates" / "review.html"
+TEMPLATE = Path(__file__).resolve().parents[2] / "templates" / "legacy_review.html"
 
 
 def build_canvas(result: dict, out_path: Path, title: str | None = None, key: str = "review") -> Path:

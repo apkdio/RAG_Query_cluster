@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -57,7 +58,16 @@ def write_state(state: ReviewState, out_dir: Path | str) -> Path:
     out_path.mkdir(parents=True, exist_ok=True)
     path = out_path / "state.json"
     temporary = path.with_name(path.name + ".tmp")
-    temporary.write_text(json.dumps(state.to_dict(), ensure_ascii=False, indent=2) + "\n",
-                         encoding="utf-8")
-    temporary.replace(path)
+    body = json.dumps(state.to_dict(), ensure_ascii=False, indent=2) + "\n"
+    for attempt in range(3):
+        try:
+            temporary.write_text(body, encoding="utf-8")
+            temporary.replace(path)
+            return path
+        except OSError:
+            if attempt < 2:
+                time.sleep(0.05)
+    # 某些 Windows 临时目录不允许 rename 覆盖，退化为直接写目标文件。
+    path.write_text(body, encoding="utf-8")
+    temporary.unlink(missing_ok=True)
     return path
