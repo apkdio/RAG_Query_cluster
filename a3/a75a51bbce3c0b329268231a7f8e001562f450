@@ -1,0 +1,70 @@
+query_cluster/src/query_cluster/entities/cluster.py
+  s_1250751e5fa60e::t_2d908d8caea85d 22-23
+query_cluster/src/query_cluster/review/actions.py
+  s_1250751e5fa60e::t_1392fb4fb9c9ae 14-16,18-31
+  s_1250751e5fa60e::t_e9f46928dbefb4 142-148
+  s_1250751e5fa60e::t_a2a486b2c537d9 17
+query_cluster/README.md
+  s_1250751e5fa60e::t_866dbb4ebc10af 33-41
+query_cluster/src/query_cluster/review/server.py
+  s_1250751e5fa60e::t_9c5c3c527b9788 29
+  s_1250751e5fa60e::t_111a637e51930a 171
+  s_1250751e5fa60e::t_2bec309c31f381 63,80
+  s_1250751e5fa60e::t_0a979e16de7431 43
+  s_1250751e5fa60e::t_ec54290ea54cc1 14
+query_cluster/src/query_cluster/entities/state.py
+  s_1250751e5fa60e::t_84c8af363e5787 91-94
+  s_1250751e5fa60e::t_010534e36c7a3f 143-144
+  s_1250751e5fa60e::t_cd5c41e91049f3 195-196
+query_cluster/tests/test_review.py
+  s_1250751e5fa60e::t_fffb84b4d21604 8
+  s_1250751e5fa60e::t_de261d26056803 68-80
+query_cluster/src/query_cluster/llm/patch.py
+  s_1250751e5fa60e::t_4719de227b27be 156-157
+query_cluster/tests/test_llm_state.py
+  s_1250751e5fa60e::t_e864274568efd5 42-43
+query_cluster/templates/review.html
+  s_1250751e5fa60e::t_3ebb03e7f4c142 579-580,583-584,586-587,589-604,606-612
+  s_1250751e5fa60e::t_5f8d13bc92193c 882
+  s_1250751e5fa60e::t_07bd0389942f6c 1091
+  s_1250751e5fa60e::t_bd611a12c07166 68-69
+  s_1250751e5fa60e::t_8cb5d033775ccf 905
+  s_1250751e5fa60e::t_6d6a0c66dfb010 160-165
+  s_1250751e5fa60e::t_b610c8026b1a49 912-917
+  s_1250751e5fa60e::t_ca7bc3d5efd136 72
+  s_1250751e5fa60e::t_ebeb1769cffdb9 879
+  s_1250751e5fa60e::t_63b39cdc1c1b24 118-122
+  s_1250751e5fa60e::t_a5bd8e5829c34f 883-884,887-889,891,893
+  s_1250751e5fa60e::t_de3063395f26bb 111
+  s_1250751e5fa60e::t_37e6120c580099 927
+  s_1250751e5fa60e::t_a4859d58dfe844 511,519
+  s_1250751e5fa60e::t_37ebf84b20aeb2 638-641,644,650,653-657
+  s_1250751e5fa60e::t_3565b2645a363e 918-926,928-935,940-945
+  s_1250751e5fa60e::t_805a203a5f3986 136-137
+  s_1250751e5fa60e::t_d31a96e3b8e6a7 936-939
+  s_1250751e5fa60e::t_bf35ebe205ec0c 995-1008
+  s_1250751e5fa60e::t_f342f92b8860b7 1264-1277
+  s_1250751e5fa60e::t_c7bd91fa102f45 1244
+  s_1250751e5fa60e::t_8af497c2556bcf 962
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "a3a75a51bbce3c0b329268231a7f8e001562f450",
+  "prompts": {},
+  "humans": {
+    "h_26b9a38f4942dd": {
+      "author": "apkdio <apkdio@163.com>"
+    }
+  },
+  "sessions": {
+    "s_1250751e5fa60e": {
+      "agent_id": {
+        "tool": "chengxiaobang",
+        "id": "s_bd3qkvb2jhxu",
+        "model": "DeepSeek-V4.1-Flash"
+      },
+      "human_author": "apkdio <apkdio@163.com>"
+    }
+  }
+}
