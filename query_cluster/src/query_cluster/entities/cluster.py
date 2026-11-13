@@ -19,3 +19,5 @@ class Cluster:
     no_action: bool = False
     slug: str = ""
     keywords: str = ""
+    llm_touched: bool = False
+    human_touched: bool = False

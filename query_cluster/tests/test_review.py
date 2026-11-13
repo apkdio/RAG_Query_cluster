@@ -5,7 +5,7 @@ from urllib.request import Request, urlopen
 import pytest
 
 from query_cluster.entities import Cluster, Query, ReviewState
-from query_cluster.review.actions import ActionError, apply_action
+from query_cluster.review.actions import ActionError, apply_action, recompute_human_tags
 from query_cluster.review.export import export_dict
 from query_cluster.review.server import make_server
 from query_cluster.clustering.pipeline import write_state
@@ -63,6 +63,19 @@ def test_create_rename_and_delete_empty_cluster():
     assert state.clusters["C1"].name == "价格咨询"
     with pytest.raises(ActionError):
         apply_action(state, {"op": "delete", "cluster_id": "C1"})
+
+
+def test_human_tag_marks_and_reverts_to_baseline():
+    baseline = sample_state()
+    moved = apply_action(baseline, {"op": "move", "qid": "Q0001", "to": "C2"})
+    recompute_human_tags(moved, baseline)
+    assert moved.clusters["C1"].human_touched is True
+    assert moved.clusters["C2"].human_touched is True
+
+    restored = apply_action(moved, {"op": "move", "qid": "Q0001", "to": "C1"})
+    recompute_human_tags(restored, baseline)
+    assert restored.clusters["C1"].human_touched is False
+    assert restored.clusters["C2"].human_touched is False
 
 
 def test_export_drops_events_and_marks_human():

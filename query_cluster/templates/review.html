@@ -65,11 +65,11 @@
   .chip.removed{border-style:dashed;border-color:#fca5a5;background:var(--red-bg);color:#991b1b;text-decoration:line-through}
   .chip.qid-hl{box-shadow:0 0 0 3px rgba(37,99,235,.25);border-color:#60a5fa}
   .diff-canvas{flex:1;min-height:0;display:flex;overflow:hidden;border:1px solid var(--line);border-radius:12px;background:#f8fafc}
-  .diff-layout{display:flex;width:100%;min-height:0}
-  .diff-stage-wrap{position:relative;flex:1;overflow:hidden;cursor:grab;
+  .diff-layout{display:flex;width:100%;height:100%;min-height:0}
+  .diff-stage-wrap{position:relative;flex:1;min-height:0;overflow:hidden;cursor:grab;user-select:none;
     background:radial-gradient(circle at 1px 1px,#dbe3ee 1px,transparent 0) 0 0/22px 22px}
   .diff-stage-wrap.dragging{cursor:grabbing}
-  #diff-stage{position:absolute;left:0;top:0;width:940px;height:700px;transform-origin:0 0}
+  #diff-stage{position:absolute;left:0;top:0;width:940px;height:700px;transform-origin:0 0;user-select:none}
   .diff-zoom{position:absolute;top:10px;left:10px;z-index:12;display:flex;gap:5px;align-items:center;
              background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:8px;padding:4px 6px;
              box-shadow:0 2px 8px rgba(15,23,42,.06)}
@@ -108,14 +108,18 @@
   .diff-pools .pool.trash .phead{color:#64748b}
   .diff-pools .pcount{margin-left:auto;font-size:10px;font-weight:500;color:var(--sub)}
   .diff-pools .chip{font-size:10.5px;padding:3px 6px}
-  .diff-side{width:300px;background:#fff;border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0;z-index:20}
+  .diff-side{width:300px;height:100%;background:#fff;border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0;z-index:20}
   .diff-side .ahead{padding:12px 14px 7px;border-bottom:1px solid #eef2f7}
   .diff-side .ahead h2{font-size:14px;margin:0 0 2px}
   .diff-side .ahead .sub{font-size:10.5px;color:var(--sub)}
   .diff-filters{display:flex;gap:4px;flex-wrap:wrap;padding:7px 10px 9px;border-bottom:1px solid #eef2f7}
   .diff-filters button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 7px;font:inherit;font-size:10px;color:var(--sub);cursor:pointer}
   .diff-filters button.active{background:#0f172a;color:#fff;border-color:#0f172a}
-  .diff-list{overflow:auto;padding:5px 8px 20px}
+  .diff-list{flex:1;min-height:0;overflow-y:auto;padding:5px 8px 20px;scrollbar-width:thin;scrollbar-color:#cbd5e1 #f8fafc}
+  .diff-list::-webkit-scrollbar{width:8px}
+  .diff-list::-webkit-scrollbar-track{background:#f8fafc}
+  .diff-list::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:999px}
+  .diff-list::-webkit-scrollbar-thumb:hover{background:#94a3b8}
   .diff-group{margin:7px 0 11px}
   .diff-gtitle{font-size:9.5px;letter-spacing:.04em;color:#94a3b8;text-transform:uppercase;margin:0 4px 3px;display:flex;justify-content:space-between}
   .diff-row{display:flex;gap:7px;align-items:flex-start;width:100%;text-align:left;border:0;background:transparent;padding:6px;border-radius:7px;cursor:pointer;font:inherit;transition:.12s}
@@ -129,7 +133,8 @@
                background:#0f172a;color:#fff;font-size:12px;padding:7px 12px;border-radius:9px;
                box-shadow:0 8px 24px rgba(15,23,42,.25);opacity:0;pointer-events:none;transition:.18s ease}
   .diff-bubble.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  body.diff-mode .board{overflow:hidden}
+  body.diff-mode .board{overflow:hidden;display:flex;flex-direction:column}
+  body.diff-mode .diff-canvas{flex:1;min-height:0;height:100%}
   @media(max-width:900px){.diff-side{width:250px}.diff-pools{right:8px;bottom:8px}.diff-pools .pool{width:170px}}
   .hint{font-size:11px;color:var(--sub);white-space:nowrap}
   main{flex:1;min-height:0;display:flex;flex-direction:column;padding:14px 18px 10px;gap:10px}
@@ -152,6 +157,12 @@
   .name:hover{border-color:var(--line);background:#f8fafc}
   .name:focus{outline:none;border-color:#93c5fd;background:#fff;box-shadow:0 0 0 2px rgba(37,99,235,.12)}
   .meta{display:flex;gap:7px;align-items:center;margin:5px 0 8px;color:var(--sub);font-size:10.5px}
+  .tags{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+  .tag{font-size:9.5px;border-radius:999px;padding:1px 6px;border:1px solid #e2e8f0;background:#f8fafc;color:#64748b}
+  .tag.auto{border-color:#bfdbfe;background:#eff6ff;color:#1e40af}
+  .tag.llm{border-color:#ddd6fe;background:#f5f3ff;color:#6d28d9}
+  .tag.manual{border-color:#fde68a;background:#fffbeb;color:#92400e}
+  .tag.human{border-color:#bbf7d0;background:#f0fdf4;color:#166534}
   .fields{display:flex;gap:6px;margin-top:8px}
   .fields input{min-width:0;flex:1;border:1px solid var(--line);border-radius:6px;padding:4px 6px;
                 font-size:10.5px;color:#334155;background:#f8fafc}
@@ -497,7 +508,7 @@ function diffApplyTransform(animate) {
   $("diff-zoom-val").textContent = Math.round(diffZoom * 100) + "%";
 }
 
-function diffFit() {
+function diffFit(animate = true) {
   const wrap = $("diff-wrap").getBoundingClientRect();
   const stage = $("diff-stage");
   const width = stage.offsetWidth || 940;
@@ -505,7 +516,7 @@ function diffFit() {
   diffZoom = Math.min(1, (wrap.width - 40) / width, (wrap.height - 40) / height);
   diffPanX = 0;
   diffPanY = 0;
-  diffApplyTransform(true);
+  diffApplyTransform(animate);
 }
 
 function diffClearHighlight() {
@@ -565,23 +576,40 @@ function diffPanToCard(id) {
   const card = diffCardOf(id);
   if (!card || card.classList.contains("pool") || id === "PENDING" || id === "TRASH") return;
   const wrap = $("diff-wrap").getBoundingClientRect();
-  const left = card.offsetLeft * diffZoom + diffPanX;
-  const top = card.offsetTop * diffZoom + diffPanY;
+  const rawLeft = card.offsetLeft * diffZoom;
+  const rawTop = card.offsetTop * diffZoom;
   const width = card.offsetWidth * diffZoom;
   const height = card.offsetHeight * diffZoom;
-  let nextX = diffPanX;
-  let nextY = diffPanY;
-  if (left < 20 || left + width > wrap.width - 20) {
-    nextX = diffPanX + (wrap.width / 2 - (left + width / 2));
+  if (rawLeft + diffPanX < 20 || rawLeft + diffPanX + width > wrap.width - 20) {
+    diffPanX = wrap.width / 2 - (rawLeft + width / 2);
   }
-  if (top < 20 || top + height > wrap.height - 20) {
-    nextY = diffPanY + (wrap.height / 2 - (top + height / 2));
+  if (rawTop + diffPanY < 20 || rawTop + diffPanY + height > wrap.height - 20) {
+    diffPanY = wrap.height / 2 - (rawTop + height / 2);
   }
-  if (nextX !== diffPanX || nextY !== diffPanY) {
-    diffPanX = nextX;
-    diffPanY = nextY;
-    diffApplyTransform(true);
+  diffApplyTransform(true);
+}
+
+function diffFitCards(ids) {
+  const cards = ids.map((id) => diffCardOf(id)).filter((card) => card && !card.classList.contains("pool"));
+  if (!cards.length) return;
+  const wrap = $("diff-wrap").getBoundingClientRect();
+  let left = Infinity;
+  let top = Infinity;
+  let right = -Infinity;
+  let bottom = -Infinity;
+  for (const card of cards) {
+    left = Math.min(left, card.offsetLeft);
+    top = Math.min(top, card.offsetTop);
+    right = Math.max(right, card.offsetLeft + card.offsetWidth);
+    bottom = Math.max(bottom, card.offsetTop + card.offsetHeight);
   }
+  const width = Math.max(1, right - left);
+  const height = Math.max(1, bottom - top);
+  const nextZoom = Math.max(0.35, Math.min(diffZoom, (wrap.width - 60) / width, (wrap.height - 60) / height));
+  diffZoom = nextZoom;
+  diffPanX = wrap.width / 2 - ((left + right) / 2) * diffZoom;
+  diffPanY = wrap.height / 2 - ((top + bottom) / 2) * diffZoom;
+  diffApplyTransform(true);
 }
 
 function diffLocation(state, qid) {
@@ -607,19 +635,26 @@ function diffName(state, qid) {
 function diffShowBubble(qid) {
   const target = targetData || DATA;
   const bubble = $("diff-bubble");
-  bubble.textContent = `${qid} · 最终归属：${diffName(target, qid)}`;
+  const move = (diffData && diffData.moves || []).find((item) => item.qid === qid);
+  bubble.textContent = move
+    ? `${qid} · ${locationName(move.from)} → ${locationName(move.to)}`
+    : `${qid} · 最终归属：${diffName(target, qid)}`;
   bubble.classList.add("show");
   clearTimeout(diffShowBubble.timer);
-  diffShowBubble.timer = setTimeout(() => bubble.classList.remove("show"), 1800);
+  diffShowBubble.timer = setTimeout(() => bubble.classList.remove("show"), 2200);
 }
 
 function diffSelectQid(qid) {
   diffPin = qid;
   diffHighlight(qid, true);
+  const cards = [...diffRelatedCards(qid)];
   const target = targetData || DATA;
   const location = diffLocation(target, qid);
-  if (location.kind === "cluster") diffPanToCard(location.id);
-  else {
+  if (cards.length > 1) {
+    diffFitCards(cards);
+  } else if (location.kind === "cluster") {
+    diffPanToCard(location.id);
+  } else {
     const pool = diffCardOf(location.id);
     if (pool) {
       document.querySelectorAll("#diff-stage .cluster,.diff-pools .pool").forEach((el) => el.classList.remove("focus"));
@@ -841,18 +876,21 @@ function renderDiffCanvas() {
       deleted: true,
     })),
   ];
-  const columns = $("diff-wrap").clientWidth < 800 ? 2 : 3;
+  const columns = squareColumns(cards.length, $("diff-wrap").clientWidth, 240, 40);
   const gapX = 326;
-  const gapY = 290;
   const stage = $("diff-stage");
-  stage.style.width = `${Math.max(632, columns * gapX + 20)}px`;
-  stage.style.height = `${Math.max(420, Math.ceil(cards.length / columns) * gapY + 40)}px`;
+  stage.style.width = `${Math.max(320, columns * gapX + 20)}px`;
+  stage.style.height = "420px";
+  const columnTops = Array(columns).fill(100);
   cards.forEach((entry, index) => {
     const card = diffBuildCard(entry.item, target, base, entry.deleted);
-    card.style.left = `${20 + (index % columns) * gapX}px`;
-    card.style.top = `${100 + Math.floor(index / columns) * gapY}px`;
+    const column = index % columns;
+    card.style.left = `${20 + column * gapX}px`;
+    card.style.top = `${columnTops[column]}px`;
     stage.append(card);
+    columnTops[column] = columnTops[column] + card.offsetHeight + 24;
   });
+  stage.style.height = `${Math.max(420, Math.max(...columnTops) + 40)}px`;
   if (!cards.length) {
     const empty = document.createElement("div");
     empty.className = "empty";
@@ -864,12 +902,46 @@ function renderDiffCanvas() {
   }
   diffBuildPools(target, diffData);
   diffBuildSidebar(diffData);
-  diffApplyTransform(false);
+  diffFit(false);
 }
 
 function renderDiff() {
   renderDiffCanvas();
 }
+
+function squareColumns(count, availableWidth, minCellWidth, gap) {
+  const ideal = Math.max(1, Math.ceil(Math.sqrt(count)));
+  const maxByWidth = Math.max(1, Math.floor((availableWidth + gap) / (minCellWidth + gap)));
+  return Math.max(1, Math.min(ideal, maxByWidth));
+}
+
+function layoutReviewGrid() {
+  const grid = $("grid");
+  if (mode === "diff" || !grid) return;
+  const count = grid.querySelectorAll(".cluster").length;
+  if (!count) {
+    grid.style.gridTemplateColumns = "";
+    return;
+  }
+  const width = grid.clientWidth || grid.parentElement.clientWidth || 0;
+  const columns = squareColumns(count, width, 150, 12);
+  grid.style.gridTemplateColumns = `repeat(${columns}, minmax(0, 1fr))`;
+}
+
+let reviewGridFrame = 0;
+function scheduleReviewGrid() {
+  if (reviewGridFrame) return;
+  reviewGridFrame = requestAnimationFrame(() => {
+    reviewGridFrame = 0;
+    if (mode === "diff") {
+      renderDiff();
+      return;
+    }
+    layoutReviewGrid();
+  });
+}
+
+window.addEventListener("resize", scheduleReviewGrid);
 
 function render() {
   if (mode === "diff") {
@@ -887,8 +959,7 @@ function render() {
   $("trash-count").textContent = (DATA.trash || []).length;
 
   const grid = $("grid");
-  grid.innerHTML = "";
-  for (const cluster of clusters) {
+  grid.innerHTML = "";  for (const cluster of clusters) {
     const card = document.createElement("section");
     card.className = "cluster";
     card.dataset.cluster = cluster.cluster_id;
@@ -921,10 +992,20 @@ function render() {
       meta.append(cohesion);
     }
     if (cluster.kind) {
-      const kind = document.createElement("span");
-      kind.textContent = cluster.kind === "llm" ? "LLM 调整"
-        : cluster.kind === "manual" ? "人工新建" : "自动聚类";
-      meta.append(kind);
+      const tags = document.createElement("div");
+      tags.className = "tags";
+      const addTag = (label, className) => {
+        const tag = document.createElement("span");
+        tag.className = "tag " + className;
+        tag.textContent = label;
+        tags.append(tag);
+      };
+      if (cluster.kind === "manual") addTag("Manual", "manual");
+      else if (cluster.kind === "llm") addTag("LLM", "llm");
+      else addTag("Auto", "auto");
+      if (cluster.llm_touched && cluster.kind !== "llm") addTag("LLM", "llm");
+      if (cluster.human_touched) addTag("Human", "human");
+      meta.append(tags);
     }
 
     const chips = document.createElement("div");
@@ -1007,6 +1088,7 @@ function render() {
     box.innerHTML = "";
     for (const qid of DATA[pool] || []) box.append(chip(qid));
   }
+  layoutReviewGrid();
   updateSelection();
 }
 
@@ -1159,6 +1241,7 @@ $("target-file").addEventListener("change", async () => {
 const diffWrap = $("diff-wrap");
 diffWrap.addEventListener("mousedown", (event) => {
   if (event.target.closest(".cluster,.pool,button,.diff-row,.diff-zoom")) return;
+  event.preventDefault();
   diffDrag = {x: event.clientX, y: event.clientY, panX: diffPanX, panY: diffPanY, moved: false};
   diffWrap.classList.add("dragging");
 });
@@ -1178,6 +1261,20 @@ window.addEventListener("mouseup", () => {
   diffWrap.classList.remove("dragging");
   if (!moved) diffClearPin();
 });
+diffWrap.addEventListener("wheel", (event) => {
+  if (!(event.ctrlKey || event.metaKey)) return;
+  event.preventDefault();
+  const rect = diffWrap.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+  const oldZoom = diffZoom;
+  const nextZoom = Math.max(0.35, Math.min(1.8, diffZoom * (event.deltaY < 0 ? 1.1 : 0.9)));
+  if (nextZoom === oldZoom) return;
+  diffPanX = mouseX - (mouseX - diffPanX) * (nextZoom / oldZoom);
+  diffPanY = mouseY - (mouseY - diffPanY) * (nextZoom / oldZoom);
+  diffZoom = nextZoom;
+  diffApplyTransform(false);
+}, {passive: false});
 $("diff-zoom-in").onclick = () => {
   diffZoom = Math.min(1.4, diffZoom + 0.1);
   diffApplyTransform(true);

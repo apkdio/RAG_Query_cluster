@@ -11,7 +11,7 @@ from ..clustering.pipeline import write_state_file
 from ..entities.state import ReviewState, StateError
 from ..paths import TEMPLATES_DIR
 from ..state_files import HUMAN_STATE
-from .actions import ActionError, apply_action
+from .actions import ActionError, apply_action, recompute_human_tags
 from .diff import diff_states
 from .export import export_dict
 
@@ -26,6 +26,7 @@ def make_server(state: ReviewState, state_path: Path | str,
 
     class Handler(BaseHTTPRequestHandler):
         review_state = state
+        baseline = state.clone()
         undo_stack: list[dict] = []
         redo_stack: list[dict] = []
         history_limit = 100
@@ -39,6 +40,7 @@ def make_server(state: ReviewState, state_path: Path | str,
             }
 
         def _commit(self, next_state: ReviewState) -> None:
+            recompute_human_tags(next_state, type(self).baseline)
             previous = type(self).review_state
             type(self).review_state = next_state
             try:
@@ -58,6 +60,7 @@ def make_server(state: ReviewState, state_path: Path | str,
             snapshot = type(self).undo_stack.pop()
             try:
                 restored = ReviewState.from_dict(snapshot)
+                recompute_human_tags(restored, type(self).baseline)
                 type(self).review_state = restored
                 self._persist()
             except (OSError, StateError):
@@ -74,6 +77,7 @@ def make_server(state: ReviewState, state_path: Path | str,
             snapshot = type(self).redo_stack.pop()
             try:
                 restored = ReviewState.from_dict(snapshot)
+                recompute_human_tags(restored, type(self).baseline)
                 type(self).review_state = restored
                 self._persist()
             except (OSError, StateError):
@@ -164,6 +168,7 @@ def make_server(state: ReviewState, state_path: Path | str,
                     if not isinstance(payload, dict):
                         raise ActionError("state 必须是对象")
                     next_state = ReviewState.from_dict(payload)
+                    type(self).baseline = next_state.clone()
                     self._commit(next_state)
                     self._json(next_state.to_dict())
                     return

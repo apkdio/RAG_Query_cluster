@@ -39,6 +39,8 @@ def test_apply_patch_move_create_and_auto_delete_empty_cluster():
     assert "C2" not in state.clusters
     assert log["created"] == [{"cluster_id": "N1", "size": 2}]
     assert state.clusters["N1"].kind == "llm"
+    assert state.clusters["N1"].llm_touched is True
+    assert state.clusters["C1"].llm_touched is True
 
 
 def test_apply_patch_delete_is_final_state_not_order_dependent():

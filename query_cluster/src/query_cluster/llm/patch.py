@@ -153,6 +153,8 @@ def apply_patch(state: ReviewState, patch: object) -> tuple[ReviewState, dict]:
     for cluster_id, cluster in work.clusters.items():
         previous = before_members.get(cluster_id)
         cluster.cohesion = None if previous != cluster.members else state.clusters[cluster_id].cohesion
+        if previous != cluster.members:
+            cluster.llm_touched = True
 
     moves = [
         {

@@ -2,7 +2,6 @@
 
 词表输入、自动聚类、LLM 初审与人工复核。
 
-当前 S0–S7 已完成：`entities/`、`preprocess/`、`clustering/`、`llm/`、`review/`、`tools/` 已落地；同一次 run 的算法、LLM、人工结果分别写成 `state.clustering.json`、`state.llm.json`、`state.human.json`，复核页统一加载 JSON。
 
 ## 运行
 
@@ -30,6 +29,15 @@ uv run --package query-cluster python -m pytest -q
 ```
 
 默认 `--backend auto` 优先调用本机 Ollama 的 `bge-m3`，不可用时退回哈希向量。
+
+## 复核标签
+
+复核页的标签是叠加显示的，不是单选状态：
+
+- `Auto`：算法聚类产生的簇。
+- `LLM`：LLM 复核阶段改动过成员的簇；LLM 新建簇直接显示 `LLM`。
+- `Manual`：人工新建的簇。
+- `Human`：复核页上簇对象与载入时的基线不同（成员、名称、slug、keywords 等）；改回基线后自动撤销。
 
 ## 结构
 

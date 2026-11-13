@@ -11,6 +11,24 @@ class ActionError(ValueError):
     """人工复核动作不合法。"""
 
 
+def _cluster_signature(cluster: Cluster) -> tuple:
+    return (
+        cluster.name,
+        frozenset(cluster.members),
+        cluster.kind,
+        cluster.slug,
+        cluster.keywords,
+        cluster.no_action,
+    )
+
+
+def recompute_human_tags(state: ReviewState, baseline: ReviewState) -> None:
+    """簇对象与基线不同则标记 human，归位则撤销。"""
+    for cluster_id, cluster in state.clusters.items():
+        original = baseline.clusters.get(cluster_id)
+        cluster.human_touched = original is None or _cluster_signature(cluster) != _cluster_signature(original)
+
+
 def _qids(action: dict) -> list[str]:
     values = action.get("qids")
     if values is None and isinstance(action.get("qid"), str):
@@ -121,6 +139,13 @@ def apply_action(state: ReviewState, action: dict) -> ReviewState:
     for cluster_id in list(work.clusters):
         if not work.clusters[cluster_id].members:
             del work.clusters[cluster_id]
+    for cluster_id in touched:
+        if cluster_id in work.clusters:
+            work.clusters[cluster_id].human_touched = True
+    if op == "create" and cluster_id in work.clusters:
+        work.clusters[cluster_id].human_touched = True
+    if op in {"rename", "update"} and cluster_id in work.clusters:
+        work.clusters[cluster_id].human_touched = True
     work.meta["stage"] = "human"
     work.events.append(new_event("human_action", action=action))
     try:

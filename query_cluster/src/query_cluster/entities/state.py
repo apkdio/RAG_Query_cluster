@@ -88,6 +88,10 @@ class ReviewState:
                     errors.append(f"{cluster_id} 的 {field_name} 必须是字符串")
             if not isinstance(cluster.no_action, bool):
                 errors.append(f"{cluster_id} 的 no_action 必须是布尔值")
+            if not isinstance(cluster.llm_touched, bool):
+                errors.append(f"{cluster_id} 的 llm_touched 必须是布尔值")
+            if not isinstance(cluster.human_touched, bool):
+                errors.append(f"{cluster_id} 的 human_touched 必须是布尔值")
 
         for pool_name, pool in (("pending", self.pending), ("trash", self.trash)):
             if not isinstance(pool, list):
@@ -136,6 +140,8 @@ class ReviewState:
                     "no_action": cluster.no_action,
                     "slug": cluster.slug,
                     "keywords": cluster.keywords,
+                    "llm_touched": cluster.llm_touched,
+                    "human_touched": cluster.human_touched,
                 }
                 for cluster in self.clusters.values()
             ],
@@ -186,6 +192,8 @@ class ReviewState:
                 no_action=raw.get("no_action", False),
                 slug=raw.get("slug", ""),
                 keywords=raw.get("keywords", ""),
+                llm_touched=raw.get("llm_touched", False),
+                human_touched=raw.get("human_touched", False),
             )
 
         pending = payload.get("pending", [])
