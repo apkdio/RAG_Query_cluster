@@ -2,5 +2,12 @@
   "threshold": 0.62,
   "high_similarity_override": 0.75,
   "lexical_guard": true,
-  "embedding": "auto"
+  "embedding": "auto",
+  "ollama_url": "http://127.0.0.1:11434",
+  "embedding_model": "your_embedding_model",
+  "hash_dim": 512,
+  "embedding_timeout": 30,
+  "stop_bigrams": [
+    "your_stop_bigrams"
+  ]
 }

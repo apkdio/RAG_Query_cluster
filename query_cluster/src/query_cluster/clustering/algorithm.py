@@ -5,9 +5,6 @@ from __future__ import annotations
 from .embed import cosine
 from ..preprocess.normalize import content_bigrams
 
-THRESHOLD = 0.62
-OVERRIDE_SIM = 0.75
-
 
 def similarity_matrix(vectors: list[list[float]]) -> list[list[float]]:
     n = len(vectors)
@@ -20,22 +17,24 @@ def similarity_matrix(vectors: list[list[float]]) -> list[list[float]]:
     return sim
 
 
-def _guard_ok(members_a: list[int], members_b: list[int], texts: list[str],
-              grams: list[set[str]], avg: float) -> bool:
-    if avg >= OVERRIDE_SIM:
+def _guard_ok(members_a: list[int], members_b: list[int], grams: list[set[str]],
+              avg: float, high_similarity_override: float,
+              lexical_guard: bool) -> bool:
+    if not lexical_guard or avg >= high_similarity_override:
         return True
-    shared = any(grams[i] & grams[j] for i in members_a for j in members_b)
-    return shared
+    return any(grams[i] & grams[j] for i in members_a for j in members_b)
 
 
 def cluster_terms(texts: list[str], vectors: list[list[float]],
-                  threshold: float = THRESHOLD) -> list[list[int]]:
+                  threshold: float, high_similarity_override: float,
+                  lexical_guard: bool, stop_bigrams: set[str] | frozenset[str]
+                  ) -> list[list[int]]:
     """平均链接：每次合并平均相似度最高且过词面校验的两个簇。"""
     n = len(texts)
     if n == 0:
         return []
     sim = similarity_matrix(vectors)
-    grams = [content_bigrams(t) for t in texts]
+    grams = [content_bigrams(t, stop_bigrams) for t in texts]
     members = [[i] for i in range(n)]
 
     while len(members) > 1:
@@ -46,7 +45,8 @@ def cluster_terms(texts: list[str], vectors: list[list[float]],
                 avg = sum(sim[i][j] for i in left for j in right) / (len(left) * len(right))
                 if avg < threshold:
                     continue
-                if not _guard_ok(left, right, texts, grams, avg):
+                if not _guard_ok(left, right, grams, avg, high_similarity_override,
+                                 lexical_guard):
                     continue
                 if best is None or avg > best[0]:
                     best = (avg, a, b)

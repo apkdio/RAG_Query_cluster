@@ -9,6 +9,7 @@ def test_client_reads_config_file(tmp_path):
         "base_url": "http://127.0.0.1:9999/v1",
         "model": "demo-model",
         "timeout": 12,
+        "temperature": 0.2,
         "api_key_env": "DEMO_LLM_KEY",
     }), encoding="utf-8")
     config = load_config(path)
@@ -17,6 +18,7 @@ def test_client_reads_config_file(tmp_path):
     assert client.base_url == "http://127.0.0.1:9999/v1"
     assert client.model == "demo-model"
     assert client.timeout == 12
+    assert client.temperature == 0.2
 
 
 def test_client_argument_overrides_config(tmp_path):

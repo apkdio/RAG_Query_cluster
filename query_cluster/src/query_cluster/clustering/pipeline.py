@@ -10,21 +10,41 @@ from pathlib import Path
 from ..entities.cluster import Cluster
 from ..entities.state import ReviewState
 from ..preprocess.dedupe import dedupe_queries
-from .algorithm import THRESHOLD, cluster_terms, cohesion, similarity_matrix
+from .algorithm import cluster_terms, cohesion, similarity_matrix
+from .config import ClusteringConfig, load_clustering_config
 from .embed import embed_texts
 
 
-def build_state(raw: str, backend: str = "auto", threshold: float = THRESHOLD,
+def build_state(raw: str, backend: str | None = None,
+                config: ClusteringConfig | None = None,
+                config_path: str | None = None,
+                threshold: float | None = None,
                 now: str | None = None) -> ReviewState:
     """把一批用 | 分隔的词聚成 ReviewState。"""
     queries = dedupe_queries(raw)
     if not queries:
         raise ValueError("输入为空")
 
+    settings = config or load_clustering_config(config_path)
     texts = [query.text for query in queries]
-    vectors, actual_backend = embed_texts(texts, backend)
+    vectors, actual_backend = embed_texts(
+        texts,
+        backend or settings.embedding,
+        settings.ollama_url,
+        settings.embedding_model,
+        settings.hash_dim,
+        settings.embedding_timeout,
+    )
     sim = similarity_matrix(vectors)
-    groups = cluster_terms(texts, vectors, threshold)
+    effective_threshold = settings.threshold if threshold is None else threshold
+    groups = cluster_terms(
+        texts,
+        vectors,
+        effective_threshold,
+        settings.high_similarity_override,
+        settings.lexical_guard,
+        settings.stop_bigrams,
+    )
 
     clusters: dict[str, Cluster] = {}
     for index, group in enumerate(groups, start=1):
@@ -43,7 +63,9 @@ def build_state(raw: str, backend: str = "auto", threshold: float = THRESHOLD,
             "stage": "clustering",
             "created_at": now or datetime.now().isoformat(timespec="seconds"),
             "source": "average_link",
-            "threshold": threshold,
+            "threshold": effective_threshold,
+            "high_similarity_override": settings.high_similarity_override,
+            "lexical_guard": settings.lexical_guard,
             "embedding": actual_backend,
             "count": len(queries),
             "clusters": len(clusters),

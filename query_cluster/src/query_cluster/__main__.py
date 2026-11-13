@@ -9,6 +9,7 @@ from pathlib import Path
 from .clustering.pipeline import build_state, write_state
 from .entities.state import ReviewState
 from .llm import LLMError, client_from_env
+from .llm.client import load_config
 from .llm.review import (
     DEFAULT_INSTRUCTIONS,
     LLMReviewError,
@@ -36,7 +37,10 @@ def main(argv: list[str] | None = None) -> int:
     p_cluster.add_argument("--input", default=None, help="输入文件，词之间用 | 分隔")
     p_cluster.add_argument("--text", default=None, help="直接传入词串，词之间用 | 分隔")
     p_cluster.add_argument("--out", default=str(OUT_DIR), help="输出目录")
-    p_cluster.add_argument("--backend", choices=["auto", "ollama", "hash"], default="auto")
+    p_cluster.add_argument("--config", default=None,
+                           help="聚类配置，默认 config/clustering.json（缺失时用 example）")
+    p_cluster.add_argument("--backend", choices=["auto", "ollama", "hash"], default=None,
+                           help="覆盖配置里的 embedding 后端")
 
     p_serve = sub.add_parser("serve", help="启动 ReviewState 本地复核服务")
     p_serve.add_argument("--state", required=True, help="state.clustering/llm/human.json")
@@ -56,13 +60,14 @@ def main(argv: list[str] | None = None) -> int:
     p_llm.add_argument("--model", default=None, help="默认取 config/llm.json 或 LLM_MODEL")
     p_llm.add_argument("--api-key-env", default=None, help="默认取 config/llm.json 或 LLM_API_KEY")
     p_llm.add_argument("--timeout", type=int, default=None, help="默认取 config/llm.json")
-    p_llm.add_argument("--max-attempts", type=int, default=3)
+    p_llm.add_argument("--max-attempts", type=int, default=None,
+                       help="默认取 config/llm.json 的 max_attempts")
 
     args = parser.parse_args(argv)
 
     if args.cmd == "cluster":
         raw = _read_input(args.input, args.text)
-        state = build_state(raw, backend=args.backend)
+        state = build_state(raw, backend=args.backend, config_path=args.config)
         state_path = write_state(state, Path(args.out), filename=CLUSTERING_STATE)
         print(f"{len(state.queries)} 个词 -> {len(state.clusters)} 个簇")
         print(f"状态：{state_path}")
@@ -88,7 +93,11 @@ def main(argv: list[str] | None = None) -> int:
         try:
             state = ReviewState.from_dict(json.loads(Path(args.state).read_text(encoding="utf-8")))
             client = client_from_env(args.base_url, args.model, args.api_key_env, args.timeout)
-            result = review_state(state, instructions, client.chat, args.max_attempts)
+            max_attempts = (
+                args.max_attempts if args.max_attempts is not None
+                else int(load_config().get("max_attempts", 3))
+            )
+            result = review_state(state, instructions, client.chat, max_attempts)
         except (LLMError, LLMReviewError, ValueError) as exc:
             out_dir.mkdir(parents=True, exist_ok=True)
             attempts = getattr(exc, "attempts", [])

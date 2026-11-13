@@ -3,5 +3,6 @@
   "model": "your-model",
   "timeout": 90,
   "max_attempts": 3,
+  "temperature": 0,
   "api_key_env": "LLM_API_KEY"
 }

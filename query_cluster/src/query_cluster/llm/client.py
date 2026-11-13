@@ -28,13 +28,15 @@ class LLMError(RuntimeError):
 
 
 class LLMClient:
-    def __init__(self, base_url: str, model: str, api_key: str | None = None, timeout: int = 90):
+    def __init__(self, base_url: str, model: str, api_key: str | None = None,
+                 timeout: int = 90, temperature: float = 0):
         if not base_url or not model:
             raise LLMError("需要提供 --base-url 和 --model（或 LLM_BASE_URL / LLM_MODEL）")
         self.base_url = base_url.rstrip("/")
         self.model = model
         self.api_key = api_key
         self.timeout = timeout
+        self.temperature = temperature
 
     def chat(self, messages: list[dict]) -> str:
         url = self.base_url
@@ -43,7 +45,7 @@ class LLMClient:
         payload = json.dumps({
             "model": self.model,
             "messages": messages,
-            "temperature": 0,
+            "temperature": self.temperature,
         }, ensure_ascii=False).encode("utf-8")
         headers = {"Content-Type": "application/json"}
         if self.api_key:
@@ -66,13 +68,18 @@ class LLMClient:
 
 def client_from_env(base_url: str | None = None, model: str | None = None,
                     api_key_env: str | None = None, timeout: int | None = None,
+                    temperature: float | None = None,
                     config_path: Path | str | None = None) -> LLMClient:
     config = load_config(config_path)
     key_env = api_key_env or config.get("api_key_env") or "LLM_API_KEY"
     effective_timeout = timeout if timeout is not None else int(config.get("timeout", 90))
+    effective_temperature = (
+        temperature if temperature is not None else float(config.get("temperature", 0))
+    )
     return LLMClient(
         base_url=base_url or os.environ.get("LLM_BASE_URL") or str(config.get("base_url") or ""),
         model=model or os.environ.get("LLM_MODEL") or str(config.get("model") or ""),
         api_key=os.environ.get(key_env),
         timeout=effective_timeout,
+        temperature=effective_temperature,
     )

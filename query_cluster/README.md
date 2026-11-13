@@ -11,7 +11,11 @@ $env:PYTHONPATH = "src"
 
 # 算法结果：输出 state.clustering.json
 python -m query_cluster cluster `
-  --input examples/inputs.txt --backend hash --out out/run1
+  --input examples/inputs.txt --out out/run1
+
+# 指定另一个聚类配置
+python -m query_cluster cluster `
+  --input examples/inputs.txt --config config/clustering.json --out out/run1
 
 # LLM 两阶段复核：state.llm.json 写回同一个 run 目录
 python -m query_cluster llm-review `
@@ -28,7 +32,34 @@ python -m query_cluster migrate `
 uv run --package query-cluster python -m pytest -q
 ```
 
-默认 `--backend auto` 优先调用本机 Ollama 的 `bge-m3`，不可用时退回哈希向量。
+聚类规则都在 `config/clustering.json`；文件不存在时退回 `config/clustering.example.json`。`--backend` 只用来临时覆盖配置里的 `embedding`，不再默认写死。
+
+## 配置
+
+`config/clustering.json`：
+
+```json
+{
+  "threshold": 0.62,
+  "high_similarity_override": 0.75,
+  "lexical_guard": true,
+  "embedding": "auto",
+  "ollama_url": "http://127.0.0.1:11434",
+  "embedding_model": "bge-m3",
+  "hash_dim": 512,
+  "embedding_timeout": 30,
+  "stop_bigrams": ["如何", "是否", "可以"]
+}
+```
+
+- `threshold`：平均链接合并的最低相似度；
+- `high_similarity_override`：达到该相似度时跳过词面校验；
+- `lexical_guard`：是否启用字符二元组词面校验；
+- `stop_bigrams`：不参与词面校验的疑问壳二元组；
+- `embedding`：`auto` / `ollama` / `hash`；
+- 其余是 Ollama 地址、模型、哈希维度和请求超时。
+
+`config/llm.json` 的 `timeout`、`max_attempts` 和 `temperature` 同样由代码读取；`max_attempts` 也可用命令行 `--max-attempts` 临时覆盖。
 
 ## 复核标签
 
