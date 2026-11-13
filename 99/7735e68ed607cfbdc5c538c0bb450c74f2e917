@@ -1,0 +1,58 @@
+query_cluster/src/query_cluster/clustering/algorithm.py
+  s_1250751e5fa60e::t_9cedf9ff854d64 20-23,25,29-31,37,48-49
+query_cluster/src/query_cluster/preprocess/normalize.py
+  s_1250751e5fa60e::t_9072ccb2642a6e 15,18
+query_cluster/src/query_cluster/clustering/pipeline.py
+  s_1250751e5fa60e::t_12f7b235fe1681 13-14,18-21,28,30-37,39-47,66-68
+query_cluster/src/query_cluster/clustering/__init__.py
+  s_1250751e5fa60e::t_7241364583c7e4 3-4,8-9
+query_cluster/config/llm.example.json
+  s_1250751e5fa60e::t_5e75496e76d02c 6
+query_cluster/tests/test_llm_client.py
+  s_1250751e5fa60e::t_3be4ddf842a5d8 12,21
+query_cluster/src/query_cluster/llm/client.py
+  s_1250751e5fa60e::t_b197345f745a5a 71,76-78,84
+  s_1250751e5fa60e::t_244463e9f02c12 31-32,39,48
+query_cluster/src/query_cluster/__main__.py
+  s_1250751e5fa60e::t_6937469d190f72 40-43
+  s_1250751e5fa60e::t_e8c8661285f9b6 12
+  s_1250751e5fa60e::t_b2f9c7320c2f2f 63-64
+  s_1250751e5fa60e::t_be0b1448dc55fd 70
+  s_1250751e5fa60e::t_f32c49ffc0136a 96-100
+query_cluster/src/query_cluster/clustering/config.py
+  s_1250751e5fa60e::t_363f7c9327ac77 1-115
+query_cluster/src/query_cluster/preprocess/__init__.py
+  s_1250751e5fa60e::t_238c4294ce43d6 6
+  s_1250751e5fa60e::t_f6dd880b9bfc0b 4
+query_cluster/config/clustering.example.json
+  h_26b9a38f4942dd 7,11
+  s_1250751e5fa60e::t_c81d3521c3a714 5-6,8-10,12
+query_cluster/src/query_cluster/clustering/embed.py
+  s_1250751e5fa60e::t_ced706a7e44f32 24,43-44,46,50,58-60,63,65,70
+query_cluster/tests/test_clustering_config.py
+  s_1250751e5fa60e::t_a05fa904c856b7 1-25,29-39
+  s_1250751e5fa60e::t_8ad190f04988ff 26-28
+query_cluster/README.md
+  s_1250751e5fa60e::t_524e3e6e3ee9d2 14-18,35-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "997735e68ed607cfbdc5c538c0bb450c74f2e917",
+  "prompts": {},
+  "humans": {
+    "h_26b9a38f4942dd": {
+      "author": "apkdio <apkdio@163.com>"
+    }
+  },
+  "sessions": {
+    "s_1250751e5fa60e": {
+      "agent_id": {
+        "tool": "chengxiaobang",
+        "id": "s_bd3qkvb2jhxu",
+        "model": "DeepSeek-V4.1-Flash"
+      },
+      "human_author": "apkdio <apkdio@163.com>"
+    }
+  }
+}
